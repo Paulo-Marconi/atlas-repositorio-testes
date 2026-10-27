@@ -1,54 +1,79 @@
 # Referência de avaliação da detecção — C5-A
 
 - **Arquivo analisado:** [C5-A.ts](../codigos/C5-A.ts).
-- **Cenário de origem:** 5 — Estado global e baixa testabilidade.
+- **Cenário:** Estado global e baixa testabilidade.
 - **Problemas esperados:** 3.
-- **Fonte do mecanismo principal:** [Global Data](https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/global-data.md). Os mecanismos adicionais são construções da adaptação dentro do mesmo cenário, documentadas por inspeção do código; não são atribuídos automaticamente ao exemplo original do catálogo.
-- **Regras comuns, categorias e inventário:** [Referência de avaliação da detecção](README.md).
-
-A correspondência será verificada na resposta completa. O reconhecimento da tensão ou do risco com evidência concreta poderá contar como detecção, mesmo quando o modelo considera o desenho aceitável ou recomenda adiar uma refatoração. Não será exigido nome exato do smell nem reprodução de uma resposta ideal.
+- **Mecanismos do Code Smells Catalog:** [Global Data][S13] — contexto global e cache estático compartilhados entre instâncias (01 e 02); [Hidden Dependencies][S14] — contexto e relógio resolvidos implicitamente pelo consumidor (01 e 03).
+- **Fundamentos complementares:** [Isolamento e não determinismo em testes (Fowler)][S15] — isolamento de estado entre testes e controle do tempo (02 e 03).
+- **Adaptação do cenário:** O cache de cotações (02) e a leitura direta de Date.now (03) foram construídos para este fluxo e verificados no código; não são atribuídos automaticamente ao exemplo original do catálogo.
+- **Regras comuns, categorias e inventário:** [referência de avaliação da detecção](README.md), [inventário](../inventario.json) e [detalhamento das fontes](../selecao-fontes.md).
 
 ## Problemas esperados
 
-### C5-A-01 — Checkout depende do cliente global compartilhado
+### C5-A-01 — Contexto global mutável
+
+**Variações de título (exemplos):**
+
+- “Checkout depende de configuração global compartilhada”
+- “Cliente, desconto e tributação implícitos no ambiente do módulo”
+- “Instâncias de Checkout afetadas por mudanças no contexto global”
+- “Dependência da ordem de configuração de checkoutContext”
+
+**Como confirmar a detecção:**
 
 - **Tipo:** Estado global e dependências ocultas.
-- **Decisão ou fragilidade observável:** Cada `Checkout` consulta `currentCustomer` no momento da cotação. Criar outra sessão por `startCheckout` altera o cliente de instâncias anteriores e torna as operações sensíveis à ordem de seleção.
-- **Elementos e evidências:** `currentCustomer` pertence ao módulo (linha 4); `selectCustomer` o substitui (linhas 7–11); `quote` lê seus dados e `startCheckout` seleciona o cliente global (linha 22; linhas 41–43).
-- **Critério mínimo de detecção:** Será verificado se a resposta identifica a dependência de `Checkout` no cliente global mutável e seu efeito sobre isolamento de instâncias ou ordem de execução.
-- **Variações de nome:**
-  - Cliente atual compartilhado entre checkouts.
-  - Contexto global de cliente na cotação.
-  - Sessões de checkout sem isolamento de cliente.
-- **Formulações equivalentes aceitas:** Global Data, dependência oculta, estado compartilhado ou acoplamento temporal na seleção do cliente.
-- **Afirmações insuficientes:** “Variáveis globais são ruins”; alegar que o objeto pode ser alterado diretamente por importação; afirmar que instâncias guardam clientes próprios.
-- **Distinção e contagem:** Identidade e desconto do cliente integram o mesmo contexto e um único item. O estado tributário e o relógio exigem evidências próprias.
+- **Fundamentação:** [Global Data][S13], [Hidden Dependencies][S14].
+- **Decisão ou fragilidade observável:** Checkout lê cliente, desconto e tributação de checkoutContext, um estado mutável do módulo. selectCustomer e configureTax alteram o ambiente de instâncias já criadas.
+- **Elementos e evidências:** Contexto e operações de configuração: [linhas 5–20](../codigos/C5-A.ts#L5-L20); Uso do contexto na cotação: [linhas 25–32](../codigos/C5-A.ts#L25-L32).
+- **Critério mínimo de detecção:** identificar o contexto global usado pelo checkout e reconhecer compartilhamento indevido, dependência oculta ou dificuldade de isolamento. Localizar uma parte relevante do contexto pode demonstrar o item.
+- **Formulações equivalentes aceitas:** Global Data, contexto global compartilhado, dependência temporal ou configuração global implícita.
+- **Afirmações insuficientes:** Criticar globais ou afirmar ausência de testes sem localizar a dependência, o compartilhamento ou a dificuldade de controle.
+- **Distinção e contagem:** fornecer um contexto por instância não elimina o cache estático ou a leitura direta do relógio. Os campos do contexto não são itens adicionais.
 
-### C5-A-02 — Tributação global altera cotações de instâncias existentes
+### C5-A-02 — Cache estático compartilhado
 
-- **Tipo:** Estado global e dependências ocultas.
-- **Decisão ou fragilidade observável:** `configureTax` modifica `taxPercent` compartilhado. `Checkout.quote` não recebe a política tributária, então mudar a configuração altera qualquer checkout e pode contaminar execuções ou testes posteriores.
-- **Elementos e evidências:** `taxPercent` pertence ao módulo e `configureTax` o modifica (linha 5; linhas 14–16); `quote` lê o percentual global (linha 25).
-- **Critério mínimo de detecção:** Será verificado se a resposta identifica a configuração tributária global como dependência implícita das cotações e relaciona sua alteração ao isolamento ou à ordem dos testes/operações.
-- **Variações de nome:**
-  - Configuração tributária compartilhada entre instâncias.
-  - Cotação dependente de imposto global mutável.
-  - Estado tributário que contamina testes de checkout.
-- **Formulações equivalentes aceitas:** Global Data, dependência oculta de configuração, estado compartilhado ou baixo acoplamento.
-- **Afirmações insuficientes:** Criticar apenas o cliente global; declarar percentual errado sem requisito; pedir injeção de modo genérico.
-- **Distinção e contagem:** O cliente pode permanecer igual enquanto a configuração tributária altera a cotação. Esse estado é independente de C5-A-01; uma menção genérica a globais não gera ambos os acertos.
+**Variações de título (exemplos):**
 
-### C5-A-03 — Prazo da cotação depende diretamente do relógio do ambiente
+- “Cache de cotações persiste entre instâncias de Checkout”
+- “Contaminação entre operações pelo cache estático de cotações”
+- “Cotação de contexto anterior reutilizada por outro checkout”
+- “Estado de Checkout.quotes dificulta o isolamento entre testes”
+
+**Como confirmar a detecção:**
 
 - **Tipo:** Estado global e dependências ocultas.
-- **Decisão ou fragilidade observável:** `reserveQuote` chama `Date.now` sem receber relógio ou instante. Mesmas entradas e configurações não fixam a validade temporal da cotação, dificultando testes determinísticos do prazo.
-- **Elementos e evidências:** `reserveQuote` define `expiresAtMillis` com `Date.now()` (linhas 36–37).
-- **Critério mínimo de detecção:** Será verificado se a resposta identifica a leitura direta de `Date.now` na reserva da cotação e relaciona essa dependência oculta à dificuldade de controlar o tempo ou repetir testes de validade.
-- **Variações de nome:**
-  - Relógio do sistema como dependência oculta.
-  - Validade de cotação sem controle do tempo em testes.
-  - Acoplamento temporal ao ambiente de execução.
-- **Formulações equivalentes aceitas:** Hidden Dependencies, relógio não substituível, baixa testabilidade ou proteção contra variações do ambiente.
-- **Afirmações insuficientes:** “O prazo deveria ser diferente”; dizer que qualquer horário é um problema; criticar apenas cliente ou imposto.
-- **Distinção e contagem:** O item é a dependência implícita do relógio, distinta dos dois estados mutáveis do módulo. A diferença natural entre horários só demonstra a fragilidade quando relacionada ao controle dessa dependência.
+- **Fundamentação:** [Global Data][S13], [Isolamento e não determinismo em testes (Fowler)][S15].
+- **Decisão ou fragilidade observável:** Checkout.quotes pertence à classe e persiste entre instâncias. cachedQuote pode devolver uma cotação armazenada sob um contexto anterior para o mesmo identificador, mesmo após criar outro checkout.
+- **Elementos e evidências:** Cache da classe: [linhas 23–23](../codigos/C5-A.ts#L23-L23); Consulta e escrita no cache: [linhas 34–42](../codigos/C5-A.ts#L34-L42).
+- **Critério mínimo de detecção:** localizar o estado estático e reconhecer reutilização ou interferência entre instâncias/operações que deveriam poder ser isoladas.
+- **Formulações equivalentes aceitas:** cache compartilhado, estado persistente entre testes, contaminação entre instâncias ou estado global de classe.
+- **Afirmações insuficientes:** Criticar globais ou afirmar ausência de testes sem localizar a dependência, o compartilhamento ou a dificuldade de controle.
+- **Distinção e contagem:** tornar o cache pertencente à instância remove esse compartilhamento e mantém contexto global e relógio implícito. A composição da chave e o resultado desatualizado sustentam a mesma ocorrência, sem criar outro item de bug funcional.
 
+### C5-A-03 — Relógio como dependência oculta
+
+**Variações de título (exemplos):**
+
+- “Leitura direta de Date.now em reserveQuote”
+- “Tempo não controlável no cálculo de validade da cotação”
+- “Relógio implícito dificulta testes determinísticos”
+- “Dependência temporal não fornecida pelo chamador de Checkout”
+
+**Como confirmar a detecção:**
+
+- **Tipo:** Estado global e dependências ocultas.
+- **Fundamentação:** [Hidden Dependencies][S14], [Isolamento e não determinismo em testes (Fowler)][S15].
+- **Decisão ou fragilidade observável:** Checkout.reserveQuote obtém Date.now diretamente para calcular expiresAtMillis. O chamador não fornece o instante ou um relógio controlável para repetir condições temporais.
+- **Elementos e evidências:** Leitura do relógio na reserva: [linhas 51–54](../codigos/C5-A.ts#L51-L54).
+- **Critério mínimo de detecção:** localizar a leitura e relacioná-la à dificuldade de controlar o tempo ou reproduzir condições temporais nos testes.
+- **Formulações equivalentes aceitas:** relógio implícito, dependência ambiental, dificuldade de testes determinísticos ou Hidden Dependencies.
+- **Afirmações insuficientes:** Criticar globais ou afirmar ausência de testes sem localizar a dependência, o compartilhamento ou a dificuldade de controle.
+- **Distinção e contagem:** receber um relógio controlável não reorganiza o contexto nem o cache. Não exigir alegar falha de prazo ou que duas chamadas sempre retornam horários diferentes.
+
+## Fontes
+
+Os conceitos e as adaptações estão detalhados na [seleção das fontes](../selecao-fontes.md).
+
+[S13]: https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/global-data.md
+[S14]: https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/hidden-dependencies.md
+[S15]: https://martinfowler.com/articles/nonDeterminism.html

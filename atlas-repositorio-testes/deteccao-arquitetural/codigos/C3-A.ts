@@ -1,12 +1,17 @@
 type WalletEntry = { kind: "deposit" | "withdrawal"; amountCents: number };
+type WalletPolicy = { maxWithdrawalCents: number };
 
 export class Wallet {
   private readonly entries: WalletEntry[] = [];
   private holdReason?: string;
   public spendingBlocked = false;
 
-  constructor(readonly ownerId: string, public balanceCents = 0) {
+  constructor(readonly ownerId: string, public balanceCents = 0,
+    private readonly policy: WalletPolicy = { maxWithdrawalCents: 10_000 }) {
     if (!Number.isInteger(balanceCents) || balanceCents < 0) throw new Error("Invalid opening balance");
+    if (!Number.isInteger(policy.maxWithdrawalCents) || policy.maxWithdrawalCents <= 0) {
+      throw new Error("Invalid withdrawal limit");
+    }
   }
 
   deposit(amountCents: number): void {
@@ -17,7 +22,8 @@ export class Wallet {
 
   withdraw(amountCents: number): void {
     if (this.spendingBlocked) throw new Error("Wallet is on hold");
-    if (!Number.isInteger(amountCents) || amountCents <= 0 || amountCents > this.balanceCents) {
+    if (!Number.isInteger(amountCents) || amountCents <= 0 || amountCents > this.balanceCents ||
+        amountCents > this.policy.maxWithdrawalCents) {
       throw new Error("Invalid withdrawal");
     }
     this.balanceCents -= amountCents;

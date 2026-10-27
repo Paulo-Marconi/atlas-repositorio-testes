@@ -50,6 +50,17 @@ export class DispatchService {
   }
 }
 
+export class DispatchBatch {
+  printAll(deliveries: readonly Delivery[]): Uint8Array[] {
+    const service = new DispatchService();
+    return deliveries.map((delivery) => service.print(delivery));
+  }
+}
+
+export function printDeliveries(batch: DispatchBatch, deliveries: readonly Delivery[]): Uint8Array[] {
+  return batch.printAll(deliveries);
+}
+
 export function updateLockerAccess(delivery: LockerDelivery, accessCode: string): string {
   delivery.changeAccessCode(accessCode);
   return delivery.dispatchLabel();

@@ -1,4 +1,5 @@
 type CustomerTier = "bronze" | "silver" | "gold";
+type Packaging = "envelope" | "box" | "tube";
 
 export class DeliveryPricing {
   private remoteBaseCents = 1200;
@@ -48,18 +49,39 @@ export class ShippingDiscount {
   }
 }
 
-export function quoteDeliveryOptions(pricing: DeliveryPricing, discount: ShippingDiscount,
-  weightGrams: number, tier: CustomerTier) {
+export class PackagingPolicy {
+  additionalCents(packaging: Packaging): number {
+    switch (packaging) {
+      case "envelope": return 100;
+      case "box": return 300;
+      case "tube": return 250;
+    }
+  }
+
+  description(packaging: Packaging): string {
+    switch (packaging) {
+      case "envelope": return "Padded envelope";
+      case "box": return "Cardboard box";
+      case "tube": return "Protective tube";
+    }
+  }
+}
+
+export function quoteDeliveryOptions(pricing: DeliveryPricing, discount: ShippingDiscount, packagingPolicy: PackagingPolicy,
+  weightGrams: number, tier: CustomerTier, packaging: Packaging) {
+  const additionalCents = packagingPolicy.additionalCents(packaging);
+  const total = (priceCents: number) => discount.apply(priceCents, tier) + additionalCents;
   return {
+    packaging: packagingPolicy.description(packaging),
     standard: {
-      local: discount.apply(pricing.standardLocal(weightGrams), tier),
-      regional: discount.apply(pricing.standardRegional(weightGrams), tier),
-      remote: discount.apply(pricing.standardRemote(weightGrams), tier),
+      local: total(pricing.standardLocal(weightGrams)),
+      regional: total(pricing.standardRegional(weightGrams)),
+      remote: total(pricing.standardRemote(weightGrams)),
     },
     express: {
-      local: discount.apply(pricing.expressLocal(weightGrams), tier),
-      regional: discount.apply(pricing.expressRegional(weightGrams), tier),
-      remote: discount.apply(pricing.expressRemote(weightGrams), tier),
+      local: total(pricing.expressLocal(weightGrams)),
+      regional: total(pricing.expressRegional(weightGrams)),
+      remote: total(pricing.expressRemote(weightGrams)),
     },
   };
 }

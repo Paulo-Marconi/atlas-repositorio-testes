@@ -1,5 +1,6 @@
 type Stock = { take: (sku: string, units: number) => void; receive: (sku: string, units: number) => void };
 type Allocation = { stock: Stock; sku: string; units: number };
+type ReservationConfig = { maximumUnitsBySku: Map<string, number> };
 
 export class Warehouse {
   readonly stock = new Map<string, number>();
@@ -20,16 +21,24 @@ export class Warehouse {
 
 export class ReservationBook {
   private readonly allocations = new Map<string, Allocation>();
-  public maximumUnits = 100;
+  private readonly config: ReservationConfig;
 
-  setMaximumUnits(units: number): void {
+  constructor(config: ReservationConfig) {
+    for (const units of config.maximumUnitsBySku.values()) {
+      if (!Number.isInteger(units) || units <= 0) throw new Error("Invalid reservation limit");
+    }
+    this.config = { ...config };
+  }
+
+  setMaximumUnits(sku: string, units: number): void {
     if (!Number.isInteger(units) || units <= 0) throw new Error("Invalid reservation limit");
-    this.maximumUnits = units;
+    this.config.maximumUnitsBySku.set(sku, units);
   }
 
   reserve(stock: Stock, reservationId: string, sku: string, units: number): void {
     if (this.allocations.has(reservationId)) throw new Error("Duplicate reservation");
-    if (!Number.isInteger(units) || units <= 0 || units > this.maximumUnits) {
+    const maximumUnits = this.config.maximumUnitsBySku.get(sku);
+    if (maximumUnits === undefined || !Number.isInteger(units) || units <= 0 || units > maximumUnits) {
       throw new Error("Invalid reservation quantity");
     }
     stock.take(sku, units);

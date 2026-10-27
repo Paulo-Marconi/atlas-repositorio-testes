@@ -24,9 +24,15 @@ export class ReceiptBuilder {
     }
     return id + " | " + currency + " " + (receipt.totalCents / 100).toFixed(2);
   }
+
+  issue(id: string): { body: string; reference: string } {
+    const body = this.build(id);
+    const reference = Math.floor(Math.random() * 1_000_000_000).toString(36).padStart(6, "0");
+    return { body, reference };
+  }
 }
 
-export function generateReceipts(receiptIds: string[]): string[] {
+export function generateReceipts(receiptIds: readonly string[]): Array<{ body: string; reference: string }> {
   const builder = new ReceiptBuilder();
-  return receiptIds.map((id) => builder.build(id));
+  return receiptIds.map((id) => builder.issue(id));
 }

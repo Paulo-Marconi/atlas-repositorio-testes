@@ -1,6 +1,13 @@
 type Application = { id: string; name: string; score: number; email: string };
 type Notification = { recipient: string; subject: string; body: string };
 
+function validateTuition(monthlyCents: number, scholarshipPercent: number): void {
+  if (!Number.isInteger(monthlyCents) || monthlyCents < 0 ||
+      !Number.isInteger(scholarshipPercent) || scholarshipPercent < 0 || scholarshipPercent > 100) {
+    throw new Error("Invalid tuition");
+  }
+}
+
 export class AdmissionOffice {
   private readonly students = new Map<string, Application>();
   private readonly messages: Notification[] = [];
@@ -56,10 +63,7 @@ export class StudentAccount {
   constructor(readonly studentId: string, private accessKey: string) {}
 
   chargeTuition(monthlyCents: number, scholarshipPercent: number): number {
-    if (!Number.isInteger(monthlyCents) || monthlyCents < 0 ||
-        !Number.isInteger(scholarshipPercent) || scholarshipPercent < 0 || scholarshipPercent > 100) {
-      throw new Error("Invalid tuition");
-    }
+    validateTuition(monthlyCents, scholarshipPercent);
     this.unpaidCents += Math.round(monthlyCents * (100 - scholarshipPercent) / 100);
     return this.unpaidCents;
   }
@@ -89,7 +93,19 @@ export class StudentAccount {
   }
 }
 
-export function processApplication(office: AdmissionOffice, application: Application) {
+export class EnrollmentQuote {
+  quote(monthlyCents: number, scholarshipPercent: number): number {
+    validateTuition(monthlyCents, scholarshipPercent);
+    return Math.round(monthlyCents * (100 - scholarshipPercent) / 100);
+  }
+}
+
+export function processApplication(office: AdmissionOffice, quote: EnrollmentQuote,
+  application: Application, monthlyCents: number) {
   const enrolled = office.enroll(application);
-  return { enrolled, studentCard: enrolled ? office.renderStudentCard(application.id) : undefined };
+  return {
+    enrolled,
+    studentCard: enrolled ? office.renderStudentCard(application.id) : undefined,
+    tuitionCents: enrolled ? quote.quote(monthlyCents, office.scholarshipPercent(application)) : undefined,
+  };
 }

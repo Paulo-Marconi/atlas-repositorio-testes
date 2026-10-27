@@ -1,54 +1,78 @@
 # Referência de avaliação da detecção — C3-B
 
 - **Arquivo analisado:** [C3-B.ts](../codigos/C3-B.ts).
-- **Cenário de origem:** 3 — Encapsulamento inadequado de regras e estado do domínio.
+- **Cenário:** Encapsulamento inadequado de regras e estado do domínio.
 - **Problemas esperados:** 3.
-- **Fonte do mecanismo principal:** [Indecent Exposure](https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/indecent-exposure.md). Os mecanismos adicionais são construções da adaptação dentro do mesmo cenário, documentadas por inspeção do código; não são atribuídos automaticamente ao exemplo original do catálogo.
-- **Regras comuns, categorias e inventário:** [Referência de avaliação da detecção](README.md).
-
-A correspondência será verificada na resposta completa. O reconhecimento da tensão ou do risco com evidência concreta poderá contar como detecção, mesmo quando o modelo considera o desenho aceitável ou recomenda adiar uma refatoração. Não será exigido nome exato do smell nem reprodução de uma resposta ideal.
+- **Mecanismos do Code Smells Catalog:** [Indecent Exposure][S10] — exposição da representação interna, aplicada ao estoque e às referências de reserva e configuração (01 a 03).
+- **Fundamentos complementares:** [Cópia defensiva de referências mutáveis (SEI CERT OBJ06-J)][S16] — isolamento de componentes internos e coleções mutáveis recebidas (02 e 03).
+- **Adaptação do cenário:** O retorno de Allocation (02) e a cópia superficial que mantém o Map compartilhado (03) são adaptações verificadas em TypeScript. A orientação SEI CERT é para Java e fornece apoio conceitual, sem atribuir esses casos ao exemplo do catálogo.
+- **Regras comuns, categorias e inventário:** [referência de avaliação da detecção](README.md), [inventário](../inventario.json) e [detalhamento das fontes](../selecao-fontes.md).
 
 ## Problemas esperados
 
-### C3-B-01 — Coleção pública de estoque permite contornar as operações do armazém
+### C3-B-01 — Coleção interna publicamente alterável
+
+**Variações de título (exemplos):**
+
+- “Map de estoque exposto em Warehouse.stock”
+- “Estoque alterável sem passar por receive e take”
+- “readonly não protege o conteúdo do estoque público”
+- “Encapsulamento insuficiente da coleção de estoque”
+
+**Como confirmar a detecção:**
 
 - **Tipo:** Encapsulamento de regras e estado.
-- **Decisão ou fragilidade observável:** `Warehouse.stock` expõe um `Map` mutável. `readonly` impede trocar a referência, mas não bloqueia `set`, `delete` ou `clear`, que contornam validações de recebimento e retirada.
-- **Elementos e evidências:** `stock` é público e readonly (linha 5); `receive` e `take` validam quantidades e disponibilidade (linhas 7–18).
-- **Critério mínimo de detecção:** Será verificado se a resposta identifica a mutabilidade do `Map` exposto e a possibilidade de alterar o estoque sem `receive`/`take`, contornando suas regras.
-- **Variações de nome:**
-  - Estoque interno exposto como Map mutável.
-  - Invariantes do armazém contornáveis.
-  - Coleção de estoque sem proteção de encapsulamento.
-- **Formulações equivalentes aceitas:** Indecent Exposure, estado mutável público ou insuficiência de readonly para proteger a coleção.
-- **Afirmações insuficientes:** “readonly torna o estoque imutável”; dizer apenas que existe um Map; alegar que `ReservationBook` acessa o Map diretamente.
-- **Distinção e contagem:** Alterações de saldo, remoção e limpeza do Map são consequências de um único mecanismo. O retorno de uma reserva, C3-B-02, pertence a outro estado e outra fronteira.
+- **Fundamentação:** [Indecent Exposure][S10].
+- **Decisão ou fragilidade observável:** Warehouse.stock é um Map publicamente acessível. readonly impede substituir a referência, mas set, delete e clear permitem mudar o estoque fora de receive e take.
+- **Elementos e evidências:** Coleção pública e operações do armazém: [linhas 5–20](../codigos/C3-B.ts#L5-L20).
+- **Critério mínimo de detecção:** localizar a coleção exposta e reconhecer a possibilidade de alterar o estoque sem as operações da classe.
+- **Formulações equivalentes aceitas:** estado público mutável, coleção exposta, encapsulamento frágil ou invariantes do estoque contornáveis.
+- **Afirmações insuficientes:** Citar public, readonly ou mutabilidade sem localizar a fronteira que permite alterar o estado fora das operações previstas.
+- **Distinção e contagem:** proteger o estoque do armazém não altera o objeto devolvido pelo livro de reservas nem a configuração recebida por ele. As diferentes operações sobre o Map contam como um item.
 
-### C3-B-02 — Consulta de reserva devolve o objeto interno modificável
+### C3-B-02 — Referência mutável devolvida
 
-- **Tipo:** Encapsulamento de regras e estado.
-- **Decisão ou fragilidade observável:** `ReservationBook.find` retorna a mesma alocação armazenada. O consumidor pode mudar `units`, `sku` ou `stock`; `release` usa esses dados alterados para devolver itens.
-- **Elementos e evidências:** `find` retorna diretamente o valor do Map (linha 39); `release` usa `allocation.stock`, `sku` e `units` (linhas 41–45). A alocação guarda a origem durante `reserve` (linha 36).
-- **Critério mínimo de detecção:** Será verificado se a resposta identifica o objeto retornado por `find` como estado interno mutável e relaciona sua alteração à corrupção dos dados da reserva ou da devolução.
-- **Variações de nome:**
-  - Vazamento do estado interno da reserva.
-  - Alocação de estoque modificável após a consulta.
-  - Consulta que permite alterar a reserva sem validação.
-- **Formulações equivalentes aceitas:** Referência mutável exposta, quebra de encapsulamento no retorno ou modificação externa da reserva.
-- **Afirmações insuficientes:** “O Map de reservas é público”; afirmar que a origem não é armazenada; pedir DTO sem localizar o retorno mutável.
-- **Distinção e contagem:** Quantidade, SKU e origem expostos no mesmo objeto compõem um único item. A reserva guarda a origem; a fragilidade é permitir modificá-la pelo objeto devolvido.
+**Variações de título (exemplos):**
 
-### C3-B-03 — Limite de reserva público permite contornar sua validação
+- “ReservationBook.find expõe a alocação interna”
+- “Reserva alterável por meio do objeto retornado”
+- “Vazamento de estado na consulta de reservas”
+- “Retorno da própria Allocation permite mutação externa”
+
+**Como confirmar a detecção:**
 
 - **Tipo:** Encapsulamento de regras e estado.
-- **Decisão ou fragilidade observável:** `maximumUnits` pode receber valores não inteiros ou não positivos sem `setMaximumUnits`. Como `reserve` usa esse campo, uma atribuição de `NaN` também inutiliza a comparação com o limite.
-- **Elementos e evidências:** `maximumUnits` é público (linha 23); `setMaximumUnits` valida inteiros positivos (linhas 25–27); `reserve` compara a quantidade ao campo (linha 32).
-- **Critério mínimo de detecção:** Será verificado se a resposta relaciona a escrita direta em `maximumUnits` à possibilidade de contornar o setter validado e comprometer a regra de limite de reserva.
-- **Variações de nome:**
-  - Regra de limite de reserva exposta.
-  - Configuração de quantidade alterável sem validação.
-  - Limite público que contorna a operação do domínio.
-- **Formulações equivalentes aceitas:** Encapsulamento frágil da política de quantidade ou estado de domínio alterável sem preservar sua validade.
-- **Afirmações insuficientes:** “O limite de 100 é arbitrário”; dizer apenas que falta validação em `reserve`; criticar somente o estoque.
-- **Distinção e contagem:** Este item trata da validade da política de limite. Estoque exposto e objeto de alocação vazado são mecanismos distintos. Citar encapsulamento de modo genérico não gera os três acertos.
+- **Fundamentação:** [Indecent Exposure][S10], [Cópia defensiva de referências mutáveis (SEI CERT OBJ06-J)][S16].
+- **Decisão ou fragilidade observável:** ReservationBook.find devolve a mesma Allocation mantida no livro. Alterações do consumidor em seus dados são utilizadas posteriormente por release.
+- **Elementos e evidências:** Retorno e uso da alocação: [linhas 48–56](../codigos/C3-B.ts#L48-L56).
+- **Critério mínimo de detecção:** reconhecer que o objeto retornado permite modificar externamente o estado da reserva, com localização da consulta ou da alocação.
+- **Formulações equivalentes aceitas:** vazamento de estado, objeto interno exposto, retorno mutável ou reserva alterável sem operação de domínio.
+- **Afirmações insuficientes:** Citar public, readonly ou mutabilidade sem localizar a fronteira que permite alterar o estado fora das operações previstas.
+- **Distinção e contagem:** devolver valores de leitura independentes deixa o Map público do armazém e a referência de entrada do livro presentes. Os campos da mesma alocação compõem um único item. Preservar a referência ao colaborador Stock, se necessária, não equivale a permitir trocar os dados da alocação.
 
+### C3-B-03 — Estrutura recebida compartilhada por cópia superficial
+
+**Variações de título (exemplos):**
+
+- “Cópia superficial mantém o Map de limites compartilhado”
+- “maximumUnitsBySku alterável pela configuração de entrada”
+- “Configuração de ReservationBook sem isolamento da coleção recebida”
+- “Alteração externa dos limites contorna setMaximumUnits”
+
+**Como confirmar a detecção:**
+
+- **Tipo:** Encapsulamento de regras e estado.
+- **Fundamentação:** [Indecent Exposure][S10], [Cópia defensiva de referências mutáveis (SEI CERT OBJ06-J)][S16].
+- **Decisão ou fragilidade observável:** ReservationBook valida a configuração recebida e copia somente o objeto externo. O Map maximumUnitsBySku permanece compartilhado com o chamador, que pode alterar os limites usados por reserve sem passar por setMaximumUnits.
+- **Elementos e evidências:** Validação e cópia superficial da entrada: [linhas 26–31](../codigos/C3-B.ts#L26-L31); Operação validada e uso dos limites: [linhas 33–46](../codigos/C3-B.ts#L33-L46).
+- **Critério mínimo de detecção:** identificar que a cópia superficial ou retenção da coleção permite alterar a configuração usada internamente sem passar pela validação do livro.
+- **Formulações equivalentes aceitas:** alias mutável de entrada, cópia superficial insuficiente, configuração compartilhada ou encapsulamento incompleto da coleção recebida.
+- **Afirmações insuficientes:** Citar public, readonly ou mutabilidade sem localizar a fronteira que permite alterar o estado fora das operações previstas.
+- **Distinção e contagem:** copiar o Map com valores numéricos ao receber a configuração não corrige o estoque exposto nem o retorno de find. Não exigir usar o termo “cópia profunda”; reconhecer o compartilhamento relevante basta.
+
+## Fontes
+
+Os conceitos e as adaptações estão detalhados na [seleção das fontes](../selecao-fontes.md).
+
+[S10]: https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/indecent-exposure.md
+[S16]: https://cmu-sei.github.io/secure-coding-standards/sei-cert-oracle-coding-standard-for-java/rules/object-orientation-obj/obj06-j/

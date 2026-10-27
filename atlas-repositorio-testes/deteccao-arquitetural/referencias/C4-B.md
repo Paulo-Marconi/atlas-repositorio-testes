@@ -1,40 +1,80 @@
 # Referência de avaliação da detecção — C4-B
 
 - **Arquivo analisado:** [C4-B.ts](../codigos/C4-B.ts).
-- **Cenário de origem:** 4 — Dificuldade de extensão.
-- **Problemas esperados:** 2.
-- **Fonte do mecanismo principal:** [Combinatorial Explosion](https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/combinatorial-explosion.md). Os mecanismos adicionais são construções da adaptação dentro do mesmo cenário, documentadas por inspeção do código; não são atribuídos automaticamente ao exemplo original do catálogo.
-- **Regras comuns, categorias e inventário:** [Referência de avaliação da detecção](README.md).
-
-A correspondência será verificada na resposta completa. O reconhecimento da tensão ou do risco com evidência concreta poderá contar como detecção, mesmo quando o modelo considera o desenho aceitável ou recomenda adiar uma refatoração. Não será exigido nome exato do smell nem reprodução de uma resposta ideal.
+- **Cenário:** Dificuldade de extensão.
+- **Problemas esperados:** 3.
+- **Mecanismos do Code Smells Catalog:** [Combinatorial Explosion][S12] — operações multiplicadas pelas combinações de modalidade e região (01); [Conditional Complexity][S11] — seleções de desconto e embalagem que exigem modificar decisões existentes (02 e 03).
+- **Fundamentos complementares:** [OCP (Martin)][S4] — custo de incluir alternativas alterando a implementação existente (01 a 03); [Protected Variations (Larman)][S5] — proteção dos pontos de variação de desconto e embalagem (02 e 03).
+- **Adaptação do cenário:** Tarifas, descontos e embalagens foram combinados num exemplo próprio em TypeScript. Os três eixos são construções do experimento, apoiadas nos mecanismos do catálogo e nos princípios indicados.
+- **Regras comuns, categorias e inventário:** [referência de avaliação da detecção](README.md), [inventário](../inventario.json) e [detalhamento das fontes](../selecao-fontes.md).
 
 ## Problemas esperados
 
-### C4-B-01 — Métodos multiplicados por combinações de modalidade e região
+### C4-B-01 — Multiplicação de operações por combinações
+
+**Variações de título (exemplos):**
+
+- “Explosão combinatória entre modalidade e região de entrega”
+- “API de preços multiplicada por combinações de frete”
+- “Tarifas específicas para cada par de modalidade e região”
+- “Novas opções de frete ampliam métodos e a enumeração da cotação”
+
+**Como confirmar a detecção:**
 
 - **Tipo:** Dificuldade de extensão.
-- **Decisão ou fragilidade observável:** `DeliveryPricing` implementa cada combinação de modalidade e região em um método. A adição de uma modalidade ou região exige ampliar a matriz e as chamadas de composição.
-- **Elementos e evidências:** Os seis métodos standard/express × local/regional/remote repetem cálculo (linhas 6–31); `quoteDeliveryOptions` chama explicitamente todas as combinações (linhas 51–62).
-- **Critério mínimo de detecção:** Será verificado se a resposta identifica a multiplicação de métodos por modalidade/região e relaciona essa organização à necessidade de criar ou alterar vários pontos para novas combinações.
-- **Variações de nome:**
-  - Explosão combinatória de tarifas de entrega.
-  - Matriz de modalidades e regiões codificada em métodos.
-  - Extensão de frete com multiplicação de operações.
-- **Formulações equivalentes aceitas:** Combinatorial Explosion, OCP, proteção contra variações ou falta de composição de políticas independentes.
-- **Afirmações insuficientes:** “Há duplicação” sem localizar os eixos ou o custo de extensão; apontar apenas seis métodos; dizer que a tarifa base é pública.
-- **Distinção e contagem:** Repetição do cálculo e enumeração em `quoteDeliveryOptions` são consequências da mesma matriz. Não serão pontuadas separadamente.
+- **Fundamentação:** [OCP (Martin)][S4], [Combinatorial Explosion][S12].
+- **Decisão ou fragilidade observável:** DeliveryPricing implementa as combinações de modalidade e região em métodos separados. quoteDeliveryOptions também enumera essas combinações para compor o resultado.
+- **Elementos e evidências:** Matriz de tarifas: [linhas 4–40](../codigos/C4-B.ts#L4-L40); Enumeração na composição da cotação: [linhas 70–87](../codigos/C4-B.ts#L70-L87).
+- **Critério mínimo de detecção:** identificar os eixos e relacionar a matriz ao crescimento das operações ou dos pontos alterados ao ampliar as alternativas.
+- **Formulações equivalentes aceitas:** explosão combinatória, variações combinadas sem composição, OCP ou Combinatorial Explosion.
+- **Afirmações insuficientes:** Citar um switch ou um conjunto finito de opções sem reconhecer os pontos de mudança necessários para ampliar o comportamento.
+- **Distinção e contagem:** separar as políticas de modalidade e região não torna extensíveis desconto ou embalagem. A enumeração e a repetição das fórmulas são evidências do mesmo item.
 
-### C4-B-02 — Política de descontos fechada nos níveis de cliente existentes
+### C4-B-02 — Despacho central fechado
+
+**Variações de título (exemplos):**
+
+- “Políticas de desconto sem ponto de extensão”
+- “Seleção fixa de descontos em ShippingDiscount”
+- “Novo nível de cliente exige modificar o cálculo central de desconto”
+- “Despacho fechado por CustomerTier”
+
+**Como confirmar a detecção:**
 
 - **Tipo:** Dificuldade de extensão.
-- **Decisão ou fragilidade observável:** `ShippingDiscount.apply` concentra descontos dos níveis bronze/silver/gold em um switch. Incluir outro nível ou uma política substituível requer modificar a união e o método central.
-- **Elementos e evidências:** `CustomerTier` lista os níveis (linha 1); `ShippingDiscount.apply` fixa as três políticas (linhas 41–46).
-- **Critério mínimo de detecção:** Será verificado se a resposta identifica o despacho fixo dos descontos em `ShippingDiscount` e reconhece seu custo de extensão para novos níveis/políticas.
-- **Variações de nome:**
-  - Descontos de frete sem ponto de extensão.
-  - Níveis de cliente fixados no cálculo de desconto.
-  - Política de desconto central fechada a variações.
-- **Formulações equivalentes aceitas:** OCP, proteção contra variações ou Conditional Complexity aplicada à política de desconto.
-- **Afirmações insuficientes:** “Um switch é ruim”; afirmar que os percentuais estão incorretos sem requisito; criticar apenas modalidades e regiões.
-- **Distinção e contagem:** Nível de cliente é um eixo independente da matriz de modalidade/região. Alterar a estrutura de tarifas não torna automaticamente extensível o desconto.
+- **Fundamentação:** [OCP (Martin)][S4], [Protected Variations (Larman)][S5], [Conditional Complexity][S11].
+- **Decisão ou fragilidade observável:** ShippingDiscount.apply concentra as políticas dos níveis de cliente num despacho central. Incluir outra política exige alterar a união CustomerTier e a implementação existente.
+- **Elementos e evidências:** Alternativas de desconto: [linhas 1–1](../codigos/C4-B.ts#L1-L1); Despacho de descontos: [linhas 42–50](../codigos/C4-B.ts#L42-L50).
+- **Critério mínimo de detecção:** localizar a seleção fixa e reconhecer seu custo para incluir ou substituir um comportamento de desconto.
+- **Formulações equivalentes aceitas:** políticas sem ponto de extensão, OCP, despacho fechado ou Conditional Complexity.
+- **Afirmações insuficientes:** Citar um switch ou um conjunto finito de opções sem reconhecer os pontos de mudança necessários para ampliar o comportamento.
+- **Distinção e contagem:** receber uma política substituível não elimina a matriz de modalidade/região ou os despachos de embalagem. Não exigir julgar percentuais ou sustentar que todo switch é inadequado.
 
+### C4-B-03 — Seleção de comportamento repetida
+
+**Variações de título (exemplos):**
+
+- “Conhecimento de embalagens duplicado”
+- “Seleção de embalagem repetida no adicional e na descrição”
+- “Nova embalagem exige mudanças coordenadas em PackagingPolicy”
+- “Preço e descrição de embalagens mantidos em decisões paralelas”
+
+**Como confirmar a detecção:**
+
+- **Tipo:** Dificuldade de extensão.
+- **Fundamentação:** [OCP (Martin)][S4], [Protected Variations (Larman)][S5], [Conditional Complexity][S11].
+- **Decisão ou fragilidade observável:** PackagingPolicy repete a escolha da embalagem para definir adicional e descrição. Uma nova categoria exige mudanças coordenadas nas duas operações e na união Packaging.
+- **Elementos e evidências:** Eixo de embalagem: [linhas 2–2](../codigos/C4-B.ts#L2-L2); Seleção repetida de embalagem: [linhas 52–68](../codigos/C4-B.ts#L52-L68).
+- **Critério mínimo de detecção:** reconhecer o eixo repetido e a necessidade de alterar mais de uma operação ao acrescentar uma categoria.
+- **Formulações equivalentes aceitas:** seleção espalhada, regras fechadas de embalagem, OCP ou alterações coordenadas para extensão.
+- **Afirmações insuficientes:** Citar um switch ou um conjunto finito de opções sem reconhecer os pontos de mudança necessários para ampliar o comportamento.
+- **Distinção e contagem:** encapsular um comportamento de embalagem não corrige tarifas por combinação ou descontos centrais. Os despachos de preço e descrição formam um item; seus nomes são apenas localização.
+
+## Fontes
+
+Os conceitos e as adaptações estão detalhados na [seleção das fontes](../selecao-fontes.md).
+
+[S4]: https://www.cs.utexas.edu/~downing/papers/OCP-1996.pdf
+[S5]: https://martinfowler.com/ieeeSoftware/protectedVariation.pdf
+[S11]: https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/conditional-complexity.md
+[S12]: https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/combinatorial-explosion.md

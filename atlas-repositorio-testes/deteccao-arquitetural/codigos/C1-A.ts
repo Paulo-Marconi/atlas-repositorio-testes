@@ -1,5 +1,10 @@
 type Sale = { product: string; quantity: number; unitPriceCents: number };
-type ReportMessage = { recipient: string; subject: string; attachment: string };
+type SubscriptionTerms = { monthlyCents: number; seats: number };
+
+function validateSubscription(terms: SubscriptionTerms): void {
+  if (!Number.isInteger(terms.monthlyCents) || terms.monthlyCents < 0 ||
+      !Number.isInteger(terms.seats) || terms.seats <= 0) throw new Error("Invalid subscription");
+}
 
 export class SalesReport {
   constructor(private readonly documents: Map<string, string>) {}
@@ -40,45 +45,44 @@ export class SalesReport {
   }
 }
 
-export class ReportMailer {
-  constructor(private readonly pending: ReportMessage[]) {}
+export class ReportAccount {
+  private readonly readers = new Set<string>();
+  private unpaidCents = 0;
 
-  schedule(recipient: string, reportName: string, body: string): void {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) throw new Error("Invalid recipient");
-    const subject = "Monthly sales: " + reportName;
-    const attachment = ["CONFIDENTIAL", body, "Prepared by the sales department"].join("\n");
-    this.pending.push({ recipient, subject, attachment });
+  grantReader(userId: string): void { this.readers.add(userId); }
+  revokeReader(userId: string): void { this.readers.delete(userId); }
+  canRead(userId: string): boolean { return this.readers.has(userId); }
+
+  chargeSubscription(terms: SubscriptionTerms): number {
+    validateSubscription(terms);
+    const charge = terms.monthlyCents + Math.max(0, terms.seats - 3) * 500;
+    this.unpaidCents += charge;
+    return charge;
   }
 
-  retryFor(recipient: string): ReportMessage[] {
-    return this.pending.filter((message) => message.recipient === recipient).map((message) => ({ ...message }));
+  pay(amountCents: number): void {
+    if (!Number.isInteger(amountCents) || amountCents <= 0 || amountCents > this.unpaidCents) {
+      throw new Error("Invalid payment");
+    }
+    this.unpaidCents -= amountCents;
+  }
+
+  outstandingCents(): number { return this.unpaidCents; }
+}
+
+export class SubscriptionPreview {
+  quote(terms: SubscriptionTerms): number {
+    validateSubscription(terms);
+    return terms.monthlyCents + Math.max(0, terms.seats - 3) * 500;
   }
 }
 
-export class ReportAdministration {
-  constructor(private readonly documents: Map<string, string>, private readonly readers: Map<string, Set<string>>) {}
-
-  grantReader(reportName: string, userId: string): void {
-    const users = this.readers.get(reportName) ?? new Set<string>();
-    users.add(userId);
-    this.readers.set(reportName, users);
-  }
-
-  canRead(reportName: string, userId: string): boolean {
-    return this.readers.get(reportName)?.has(userId) ?? false;
-  }
-
-  purgeExcept(retainedReports: ReadonlySet<string>): number {
-    let removed = 0;
-    for (const name of this.documents.keys()) {
-      if (!retainedReports.has(name)) {
-        this.documents.delete(name);
-        this.readers.delete(name);
-        removed += 1;
-      }
-    }
-    return removed;
-  }
+export function openSubscription(account: ReportAccount, preview: SubscriptionPreview,
+  userId: string, terms: SubscriptionTerms) {
+  const quotedCents = preview.quote(terms);
+  const chargedCents = account.chargeSubscription(terms);
+  account.grantReader(userId);
+  return { quotedCents, chargedCents, outstandingCents: account.outstandingCents() };
 }
 
 export function recordSale(documents: Map<string, string>, reportName: string, entry: Sale): string {

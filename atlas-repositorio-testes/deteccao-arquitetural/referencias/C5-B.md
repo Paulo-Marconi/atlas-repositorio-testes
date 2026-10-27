@@ -1,40 +1,79 @@
 # Referência de avaliação da detecção — C5-B
 
 - **Arquivo analisado:** [C5-B.ts](../codigos/C5-B.ts).
-- **Cenário de origem:** 5 — Estado global e baixa testabilidade.
-- **Problemas esperados:** 2.
-- **Fonte do mecanismo principal:** [Hidden Dependencies](https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/hidden-dependencies.md). Os mecanismos adicionais são construções da adaptação dentro do mesmo cenário, documentadas por inspeção do código; não são atribuídos automaticamente ao exemplo original do catálogo.
-- **Regras comuns, categorias e inventário:** [Referência de avaliação da detecção](README.md).
-
-A correspondência será verificada na resposta completa. O reconhecimento da tensão ou do risco com evidência concreta poderá contar como detecção, mesmo quando o modelo considera o desenho aceitável ou recomenda adiar uma refatoração. Não será exigido nome exato do smell nem reprodução de uma resposta ideal.
+- **Cenário:** Estado global e baixa testabilidade.
+- **Problemas esperados:** 3.
+- **Mecanismos do Code Smells Catalog:** [Global Data][S13] — ambiente global e cache estático compartilhados entre geradores (01 e 02); [Hidden Dependencies][S14] — fonte, moeda e gerador aleatório obtidos implicitamente (01 e 03).
+- **Fundamentos complementares:** [Isolamento e não determinismo em testes (Fowler)][S15] — isolamento de estado entre testes (02); discussão de não determinismo aplicada à aleatoriedade na adaptação (03).
+- **Adaptação do cenário:** O cache de recibos (02) e o uso direto de Math.random (03) foram construídos para este fluxo e verificados no código; não são atribuídos automaticamente ao exemplo original do catálogo.
+- **Regras comuns, categorias e inventário:** [referência de avaliação da detecção](README.md), [inventário](../inventario.json) e [detalhamento das fontes](../selecao-fontes.md).
 
 ## Problemas esperados
 
-### C5-B-01 — Dependências do gerador de recibos resolvidas por ambiente global
+### C5-B-01 — Ambiente global implícito
+
+**Variações de título (exemplos):**
+
+- “ReceiptBuilder depende de receiptEnvironment compartilhado”
+- “Fonte e moeda resolvidas por configuração global”
+- “Geração de recibos depende de inicialização externa do ambiente”
+- “Dependências de ReceiptBuilder ocultas na configuração do módulo”
+
+**Como confirmar a detecção:**
 
 - **Tipo:** Estado global e dependências ocultas.
-- **Decisão ou fragilidade observável:** `ReceiptBuilder.build` obtém fonte de dados e moeda de uma configuração do módulo. A instância não declara essas dependências e sua operação exige inicialização externa prévia.
-- **Elementos e evidências:** `configureReceipts` substitui o ambiente compartilhado (linha 5; linhas 7–9); `build` lê fonte e moeda do ambiente (linhas 15–17).
-- **Critério mínimo de detecção:** Será verificado se a resposta identifica a resolução de fonte/moeda por configuração global, reconhecendo inicialização implícita, dependência da ordem ou dificuldade de isolamento.
-- **Variações de nome:**
-  - Configuração global oculta na geração de recibos.
-  - Fonte e moeda resolvidas fora do contrato da instância.
-  - Dependências implícitas de `ReceiptBuilder`.
-- **Formulações equivalentes aceitas:** Hidden Dependencies, service locator neste mecanismo, dependência global ou baixo acoplamento.
-- **Afirmações insuficientes:** “O construtor deveria ter parâmetros” sem localizar dependências; alegar que cada instância guarda configuração própria.
-- **Distinção e contagem:** Fonte e moeda compõem o mesmo ambiente e um único problema. A configuração global será distinguida do cache estático em C5-B-02.
+- **Fundamentação:** [Global Data][S13], [Hidden Dependencies][S14].
+- **Decisão ou fragilidade observável:** ReceiptBuilder resolve fonte e moeda por receiptEnvironment, configurado externamente e compartilhado no módulo. A operação depende dessa inicialização e da configuração corrente.
+- **Elementos e evidências:** Ambiente e configuração: [linhas 5–10](../codigos/C5-B.ts#L5-L10); Resolução das dependências na geração: [linhas 15–26](../codigos/C5-B.ts#L15-L26).
+- **Critério mínimo de detecção:** identificar a resolução implícita dessas dependências e reconhecer inicialização obrigatória, dependência da ordem ou dificuldade de isolamento.
+- **Formulações equivalentes aceitas:** ambiente global, dependências ocultas, service locator nesse vínculo ou configuração compartilhada.
+- **Afirmações insuficientes:** Criticar globais ou afirmar ausência de testes sem localizar a dependência, o compartilhamento ou a dificuldade de controle.
+- **Distinção e contagem:** passar fonte/moeda por instância não elimina a persistência do cache nem a aleatoriedade da emissão. Fonte e moeda formam um item de ambiente.
 
-### C5-B-02 — Cache estático de recibos compartilha resultados entre instâncias
+### C5-B-02 — Cache estático compartilhado
+
+**Variações de título (exemplos):**
+
+- “Cache de recibos persiste entre instâncias de ReceiptBuilder”
+- “Recibo de fonte anterior reutilizado por outro gerador”
+- “Contaminação entre geradores pelo estado estático de receipts”
+- “Cache global de recibos dificulta o isolamento entre testes”
+
+**Como confirmar a detecção:**
 
 - **Tipo:** Estado global e dependências ocultas.
-- **Decisão ou fragilidade observável:** `ReceiptBuilder.receipts` pertence à classe e persiste entre geradores. Após reconfigurar a fonte, uma nova instância pode reutilizar um recibo carregado pela fonte anterior para o mesmo ID; iniciar outro gerador não isola o estado.
-- **Elementos e evidências:** `receipts` é um Map estático (linha 13); `build` consulta e grava esse estado (linhas 18–23). `configureReceipts` altera o ambiente, sem reiniciar o cache (linhas 7–9).
-- **Critério mínimo de detecção:** Será verificado se a resposta identifica o cache estático compartilhado e reconhece reutilização entre instâncias/fontes ou contaminação entre testes, apesar de criar outro gerador.
-- **Variações de nome:**
-  - Cache de recibos compartilhado entre geradores.
-  - Resultados persistentes entre testes de recibos.
-  - Estado estático que impede isolamento de `ReceiptBuilder`.
-- **Formulações equivalentes aceitas:** Global Data, estado estático compartilhado, cache dependente da ordem de execução ou baixa testabilidade.
-- **Afirmações insuficientes:** “Cache é ruim”; afirmar que identificadores diferentes usam sempre o primeiro recibo; criticar apenas a configuração global.
-- **Distinção e contagem:** O Map usa o ID corretamente para distinguir recibos na mesma fonte. O problema documentado é sua persistência compartilhada entre instâncias/configurações. Injetar fonte/moeda sem tratar o cache não elimina este mecanismo.
+- **Fundamentação:** [Global Data][S13], [Isolamento e não determinismo em testes (Fowler)][S15].
+- **Decisão ou fragilidade observável:** ReceiptBuilder.receipts é estático e guarda resultados entre geradores. Para o mesmo identificador, outra instância pode reutilizar o recibo de uma fonte anterior após reconfigurar o ambiente.
+- **Elementos e evidências:** Cache estático: [linhas 13–13](../codigos/C5-B.ts#L13-L13); Consulta e escrita no cache: [linhas 15–26](../codigos/C5-B.ts#L15-L26).
+- **Critério mínimo de detecção:** identificar o cache compartilhado e reconhecer persistência entre instâncias/fontes ou interferência entre testes.
+- **Formulações equivalentes aceitas:** estado estático, cache global, contaminação entre instâncias ou baixa testabilidade por estado persistente.
+- **Afirmações insuficientes:** Criticar globais ou afirmar ausência de testes sem localizar a dependência, o compartilhamento ou a dificuldade de controle.
+- **Distinção e contagem:** usar cache por instância deixa a configuração global e a fonte aleatória implícita presentes. O problema continua observável com fonte/moeda injetadas. A chave e a persistência não geram dois acertos.
 
+### C5-B-03 — Aleatoriedade como dependência oculta
+
+**Variações de título (exemplos):**
+
+- “Uso direto de Math.random em ReceiptBuilder.issue”
+- “Gerador aleatório não controlável pelo chamador”
+- “Referência de emissão difícil de reproduzir em testes”
+- “Fonte de não determinismo implícita na emissão de recibos”
+
+**Como confirmar a detecção:**
+
+- **Tipo:** Estado global e dependências ocultas.
+- **Fundamentação:** [Hidden Dependencies][S14], [Isolamento e não determinismo em testes (Fowler)][S15].
+- **Decisão ou fragilidade observável:** ReceiptBuilder.issue chama Math.random diretamente para compor a referência de emissão. O chamador não fornece o valor ou o gerador, dificultando controlar as saídas em testes.
+- **Elementos e evidências:** Geração implícita do valor aleatório: [linhas 28–33](../codigos/C5-B.ts#L28-L33).
+- **Critério mínimo de detecção:** localizar a obtenção implícita do valor e reconhecer dificuldade de controlar saídas ou reproduzir casos nos testes.
+- **Formulações equivalentes aceitas:** aleatoriedade não controlada, dependência ambiental implícita, fonte de não determinismo ou Hidden Dependencies.
+- **Afirmações insuficientes:** Criticar globais ou afirmar ausência de testes sem localizar a dependência, o compartilhamento ou a dificuldade de controle.
+- **Distinção e contagem:** fornecer um gerador controlável não corrige o ambiente global nem o cache. A propriedade aleatória é esperada; o alvo é o controle da dependência. Não exigir afirmar que chamadas sempre produzem valores diferentes.
+
+## Fontes
+
+Os conceitos e as adaptações estão detalhados na [seleção das fontes](../selecao-fontes.md).
+
+[S13]: https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/global-data.md
+[S14]: https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/hidden-dependencies.md
+[S15]: https://martinfowler.com/articles/nonDeterminism.html

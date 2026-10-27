@@ -1,40 +1,79 @@
 # Referência de avaliação da detecção — C1-B
 
 - **Arquivo analisado:** [C1-B.ts](../codigos/C1-B.ts).
-- **Cenário de origem:** 1 — Responsabilidades excessivas e baixa coesão.
-- **Problemas esperados:** 2.
-- **Fonte do mecanismo principal:** [Divergent Change](https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/divergent-change.md). Os mecanismos adicionais são construções da adaptação dentro do mesmo cenário, documentadas por inspeção do código; não são atribuídos automaticamente ao exemplo original do catálogo.
-- **Regras comuns, categorias e inventário:** [Referência de avaliação da detecção](README.md).
-
-A correspondência será verificada na resposta completa. O reconhecimento da tensão ou do risco com evidência concreta poderá contar como detecção, mesmo quando o modelo considera o desenho aceitável ou recomenda adiar uma refatoração. Não será exigido nome exato do smell nem reprodução de uma resposta ideal.
+- **Cenário:** Responsabilidades excessivas e baixa coesão.
+- **Problemas esperados:** 3.
+- **Mecanismos do Code Smells Catalog:** [Divergent Change][S6] — motivos independentes de mudança concentrados em AdmissionOffice e StudentAccount (01 e 02); [Shotgun Surgery][S7] — mudança da mensalidade com bolsa exige atualizar cotação e cobrança (03).
+- **Fundamentos complementares:** [SRP (Martin)][S2] — separação de responsabilidades de admissão, apresentação, finanças e acesso (01 e 02).
+- **Adaptação do cenário:** O fluxo de matrícula e mensalidades e a combinação dos três itens foram construídos para o experimento; não constituem um exemplo original do catálogo.
+- **Regras comuns, categorias e inventário:** [referência de avaliação da detecção](README.md), [inventário](../inventario.json) e [detalhamento das fontes](../selecao-fontes.md).
 
 ## Problemas esperados
 
-### C1-B-01 — Concentração de políticas de admissão, armazenamento e apresentação
+### C1-B-01 — Concentração de responsabilidades
+
+**Variações de título (exemplos):**
+
+- “Regras, matrículas, notificações e apresentação concentradas em AdmissionOffice”
+- “Acúmulo de responsabilidades em AdmissionOffice”
+- “Baixa coesão entre admissão e apresentação da carteirinha”
+- “Múltiplos motivos de mudança em AdmissionOffice”
+
+**Como confirmar a detecção:**
 
 - **Tipo:** Responsabilidades e coesão.
-- **Decisão ou fragilidade observável:** `AdmissionOffice` define aprovação e bolsa, guarda matrículas, compõe notificações e apresenta carteirinhas. Essas políticas têm motivos distintos de mudança.
-- **Elementos e evidências:** `qualifies` e `scholarshipPercent` definem políticas (linhas 8–16); `save` persiste (linhas 16–17); `sendConfirmation` e `renderStudentCard` definem conteúdo (linhas 25–39).
-- **Critério mínimo de detecção:** Será verificado se a resposta localiza em `AdmissionOffice` pelo menos duas dessas responsabilidades e reconhece concentração, baixa coesão ou diferentes motivos de mudança.
-- **Variações de nome:**
-  - Acúmulo de responsabilidades na secretaria de admissão.
-  - Mistura de regras de matrícula e apresentação.
-  - Baixa coesão em `AdmissionOffice`.
-- **Formulações equivalentes aceitas:** SRP, Divergent Change, concentração de políticas ou baixa coesão.
-- **Afirmações insuficientes:** “Tem muitas funções”; “deveria usar camadas”; descrever o fluxo sem reconhecer a tensão.
-- **Distinção e contagem:** As políticas reunidas em `AdmissionOffice` contam como um item. `enroll` coordenar o fluxo não cria outro problema.
+- **Fundamentação:** [SRP (Martin)][S2], [Divergent Change][S6].
+- **Decisão ou fragilidade observável:** AdmissionOffice implementa regras de admissão e bolsa, mantém matrículas e notificações e apresenta a carteirinha do aluno. Essas responsabilidades estão implementadas na própria classe.
+- **Elementos e evidências:** AdmissionOffice: [linhas 11–56](../codigos/C1-B.ts#L11-L56).
+- **Critério mínimo de detecção:** identificar a unidade, pelo menos duas responsabilidades e a concentração ou baixa coesão decorrente.
+- **Formulações equivalentes aceitas:** SRP, baixa coesão, Divergent Change ou mistura de regras e infraestrutura/apresentação.
+- **Afirmações insuficientes:** Quantidade de métodos ou descrição do fluxo sem reconhecer responsabilidades independentes ou a regra dispersa.
+- **Distinção e contagem:** separar apresentação ou persistência não elimina os itens de StudentAccount e da política duplicada. A coordenação simples de colaboradores não será pontuada como esse item.
 
-### C1-B-02 — Regras financeiras e controle de acesso reunidos em StudentAccount
+### C1-B-02 — Políticas independentes na mesma classe
+
+**Variações de título (exemplos):**
+
+- “Mistura de finanças e autenticação em StudentAccount”
+- “Responsabilidades de cobrança e acesso concentradas”
+- “Baixa coesão entre mensalidades e credenciais”
+- “Fronteira de StudentAccount reúne políticas independentes”
+
+**Como confirmar a detecção:**
 
 - **Tipo:** Responsabilidades e coesão.
-- **Decisão ou fragilidade observável:** `StudentAccount` mantém cobrança/pagamento de mensalidades e autenticação/bloqueio de acesso. São responsabilidades financeiras e de acesso com estado, regras e motivos de mudança independentes.
-- **Elementos e evidências:** `chargeTuition` e `pay` alteram a dívida (linhas 58–75); `signIn` controla tentativas/bloqueio e `changeAccessKey` altera a credencial (linhas 75–88).
-- **Critério mínimo de detecção:** Será verificado se a resposta identifica a mistura de cobrança/pagamento e controle de acesso em `StudentAccount`, relacionando-a à baixa coesão ou a motivos distintos de mudança.
-- **Variações de nome:**
-  - Mistura de cobrança e autenticação na conta do aluno.
-  - Responsabilidades financeiras e de acesso acumuladas.
-  - Baixa coesão em `StudentAccount`.
-- **Formulações equivalentes aceitas:** SRP, Divergent Change ou união de políticas de finanças e autenticação.
-- **Afirmações insuficientes:** “Autenticação poderia ser melhor”; discutir criptografia sem relacionar as duas responsabilidades; crítica apenas a `AdmissionOffice`.
-- **Distinção e contagem:** Uma identificação da concentração em `AdmissionOffice` não demonstra automaticamente este item. Regras de cobrança e tentativas de acesso são evidências de um único problema em `StudentAccount`.
+- **Fundamentação:** [SRP (Martin)][S2], [Divergent Change][S6].
+- **Decisão ou fragilidade observável:** StudentAccount reúne saldo de mensalidades e operações de cobrança/pagamento com credenciais, tentativas de autenticação e bloqueio de acesso.
+- **Elementos e evidências:** StudentAccount: finanças e acesso: [linhas 58–94](../codigos/C1-B.ts#L58-L94).
+- **Critério mínimo de detecção:** reconhecer a concentração das responsabilidades financeiras e de acesso nessa unidade. Não exigir localizar todas as operações, avaliar criptografia ou provar uma falha funcional.
+- **Formulações equivalentes aceitas:** políticas independentes reunidas, baixa coesão, SRP ou mistura de finanças e autenticação.
+- **Afirmações insuficientes:** Quantidade de métodos ou descrição do fluxo sem reconhecer responsabilidades independentes ou a regra dispersa.
+- **Distinção e contagem:** extrair autenticação deixa a regra de mensalidade duplicada do item 03 e o desenho de AdmissionOffice presentes.
 
+### C1-B-03 — Responsabilidade de regra dispersa
+
+**Variações de título (exemplos):**
+
+- “Regra de mensalidade duplicada entre cotação e cobrança”
+- “Cálculo de bolsa sem fonte única”
+- “Política de mensalidade espalhada entre classes”
+- “Alterações coordenadas em chargeTuition e EnrollmentQuote.quote”
+
+**Como confirmar a detecção:**
+
+- **Tipo:** Responsabilidades e coesão.
+- **Fundamentação:** [Shotgun Surgery][S7].
+- **Decisão ou fragilidade observável:** StudentAccount.chargeTuition e EnrollmentQuote.quote calculam a mesma mensalidade com bolsa em implementações distintas. A regra compartilhada não possui um único responsável.
+- **Elementos e evidências:** Cobrança da mensalidade: [linhas 65–69](../codigos/C1-B.ts#L65-L69); Previsão da mensalidade: [linhas 96–101](../codigos/C1-B.ts#L96-L101).
+- **Critério mínimo de detecção:** localizar as duas implementações e reconhecer duplicação da política, necessidade de alterações coordenadas ou risco de divergência entre elas.
+- **Formulações equivalentes aceitas:** regra espalhada, duplicação de negócio, Shotgun Surgery ou responsabilidade de cálculo distribuída inadequadamente.
+- **Afirmações insuficientes:** Quantidade de métodos ou descrição do fluxo sem reconhecer responsabilidades independentes ou a regra dispersa.
+- **Distinção e contagem:** extrair o cálculo comum deixa a mistura financeira/autenticação e o acúmulo de AdmissionOffice. Não converter cada cópia ou consequência em outro item.
+
+## Fontes
+
+Os conceitos e as adaptações estão detalhados na [seleção das fontes](../selecao-fontes.md).
+
+[S2]: https://blog.cleancoder.com/uncle-bob/2014/05/08/SingleReponsibilityPrinciple.html
+[S6]: https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/divergent-change.md
+[S7]: https://github.com/Luzkan/smells/blob/7f3f7dae09d487fbe68ad38e132135118155f30a/content/smells/shotgun-surgery.md
