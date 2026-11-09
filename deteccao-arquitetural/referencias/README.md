@@ -24,19 +24,19 @@ Cada referência abre com os mecanismos do Code Smells Catalog utilizados, os fu
 
 Os nomes descrevem o mecanismo estrutural. Os conceitos de SOLID, GRASP, coesão e acoplamento apoiam a interpretação; nomes de princípios não são, isoladamente, detecções. Os exemplos têm contexto de relatórios, matrícula, folha, entregas, carteira, reservas, exportação, cotações e recibos. O reconhecimento não exige reproduzir a narrativa de negócio.
 
-## Como usar as variações de título
+## Variações de título na classificação
 
 Cada problema apresenta quatro exemplos de títulos que podem descrever a mesma ocorrência. As variações incluem expressões mais gerais e nomes ligados às unidades do código, para ajudar a localizar o item esperado mesmo quando a análise usa outro vocabulário. Elas estão registradas em `titleVariants` no inventário e são reproduzidas nas referências individuais.
 
-Use o título como pista e confira a resposta completa com o **critério mínimo de detecção**, os **elementos e evidências** e a **distinção e contagem**. Um título igual ou semelhante não garante VP; um título diferente pode demonstrar a mesma ocorrência. A lista é ilustrativa, não exaustiva. Nomes genéricos como “baixa coesão”, “acoplamento” ou “dependência oculta” podem se referir a vários itens e exigem localizar o mecanismo próprio de cada um.
+O título serve como pista. A classificação considera a resposta completa com base no **critério mínimo de detecção**, nos **elementos e evidências** e na **distinção e contagem**. Um título igual ou semelhante não garante VP. Um título diferente pode demonstrar a mesma ocorrência. A lista é ilustrativa. Nomes genéricos como “baixa coesão”, “acoplamento” ou “dependência oculta” podem se referir a vários itens e exigem a identificação do mecanismo próprio de cada um.
 
-Por exemplo, “Conhecimento de formatos duplicado” pode corresponder a **C4-A-01** quando a análise relaciona `encode`, `contentType` e `extension` ao custo de incluir formatos. “API de ordenação com operações duplicadas” pode corresponder a **C4-A-03** quando o texto reconhece as combinações de chave e direção e seu custo de ampliação. Já “Contrato posicional amplo de preparação” não é uma variação desses itens: é um apontamento adicional que precisa de classificação própria.
+Por exemplo, “Conhecimento de formatos duplicado” pode corresponder a **C4-A-01** quando a análise relaciona `encode`, `contentType` e `extension` ao custo de incluir formatos. “API de ordenação com operações duplicadas” pode corresponder a **C4-A-03** quando o texto reconhece as combinações de chave e direção e seu custo de ampliação. Uma crítica ao contrato posicional da função de preparação conta como FP se a resposta o aponta como problema estrutural distinto e o apontamento não corresponde a nenhum dos três itens de C4-A.
 
 Vários títulos para o mesmo mecanismo geram no máximo um VP por identificador. A análise pode reconhecer a fragilidade no corpo do texto sem incluí-la na visão geral; considerar a mudança adiável não elimina a detecção quando o mecanismo foi reconhecido.
 
 ## Detecção, unidade de contagem e formulações equivalentes
 
-Uma ocorrência combina **uma unidade ou relação afetada com um mecanismo estrutural verificável**. Os princípios e os nomes de smells são interpretações dessa ocorrência, não contagens adicionais.
+Uma ocorrência esperada combina **uma unidade ou relação afetada com um mecanismo estrutural verificável**. Os princípios e os nomes de smells são interpretações dessa ocorrência, não contagens adicionais.
 
 1. Campos públicos relacionados da mesma classe são tratados conjuntamente quando representam a mesma fronteira de escrita externa. O número de campos não define o número de problemas.
 2. Efeitos de uma causa, como estado inválido, ausência de registro e dificuldade de teste, não geram itens adicionais.
@@ -44,8 +44,8 @@ Uma ocorrência combina **uma unidade ou relação afetada com um mecanismo estr
 4. Uma dependência descrita como DIP, OCP e baixo acoplamento gera um acerto, desde que esses rótulos se refiram ao mesmo vínculo.
 5. O mesmo mecanismo pode ocorrer em unidades diferentes, mas cada acerto exige localizar sua própria evidência.
 6. Uma crítica ao arquivo inteiro não recebe automaticamente os três acertos. Uma frase que localize mais de uma ocorrência pode demonstrar vários itens, sem precisar separar a resposta em tópicos.
-7. A revisão deve conseguir descrever uma alteração localizada que trate cada item enquanto os demais continuem observáveis. Essa verificação apoia o julgamento da equipe; não é uma prova formal de independência.
-8. Um construtor, um método estático, um campo público ou um condicional não caracteriza sozinho um problema. A referência precisa mostrar a dependência, a exposição ou o custo de mudança que lhe confere dimensão estrutural.
+7. A revisão verifica se uma alteração localizada trata cada item e mantém os demais observáveis. Essa verificação apoia o julgamento da equipe sobre a independência dos itens.
+8. Um construtor, um método estático, um campo público ou um condicional não caracteriza sozinho um problema. A dimensão estrutural é demonstrada pela dependência, pela exposição ou pelo custo de mudança.
 
 Uma detecção exige reconhecer a fragilidade e localizar seu mecanismo. Não exige reproduzir todas as consequências descritas, empregar um termo específico, fornecer um ataque ou caso de falha, nem propor uma técnica de correção. Uma análise que reconheça o custo estrutural e considere o desenho aceitável no momento ainda pode demonstrar detecção.
 
@@ -58,17 +58,13 @@ Uma detecção exige reconhecer a fragilidade e localizar seu mecanismo. Não ex
 | “Todo switch é ruim.” | Insuficiente para demonstrar custo de extensão. |
 | “Ao adicionar outro formato, é preciso alterar encode, contentType e extension.” | Demonstra o custo coordenado da seleção repetida de formato, com localização da classe na resposta. |
 
-VP, FN e FP seguem o capítulo: um VP por ocorrência esperada reconhecida; FN por ocorrência omitida; FP por apontamento sem fundamento no escopo avaliado. Achados reais não previstos, indeterminados e observações fora do escopo permanecem separados. A lista de três itens não transforma um quarto achado real em FP.
-
-
 ## Classificação dos apontamentos
 
 - **VP:** ocorrência esperada reconhecida conforme seu critério mínimo. Cada identificador gera no máximo um acerto por resposta.
 - **FN:** ocorrência esperada não reconhecida. Para uma classificação concluída, VP + FN = 3 por código, 6 por cenário e 30 por rodada completa.
-- **FP:** apontamento de problema estrutural sem fundamento verificável na entrada, dentro das categorias avaliadas.
-- **Achado real não previsto:** problema sustentado que não consta da referência fixada; registrar sem VP ou FP e sem alterar retroativamente o denominador.
-- **Indeterminado:** depende de requisito, contrato ou contexto não fornecido; registrar sem transformá-lo automaticamente em FP.
-- **Fora do escopo:** estilo, segurança, desempenho ou bug funcional sem dimensão estrutural nas categorias avaliadas; registrar separadamente.
+- **FP (falso positivo em relação à referência):** apontamento distinto de problema estrutural sem correspondência com nenhum dos três problemas esperados para o arquivo.
+
+Após a comparação com a referência, os apontamentos sem correspondência não foram avaliados separadamente para verificar se descreviam problemas reais no código. A contagem de FP pode, portanto, incluir tanto apontamentos sem fundamento quanto problemas reais ausentes da referência.
 
 A classificação considera a resposta completa. Uma proposta de técnica ou uma descrição neutra do que a classe faz só demonstra detecção quando o texto também reconhece o mecanismo da fragilidade. Não se exige linha exata, título, severidade, solução ou refatoração imediata.
 
@@ -76,12 +72,14 @@ Uma mesma afirmação pode reconhecer vários itens quando localizar suas evidê
 
 ## Registro e métricas
 
-A [planilha](../outputs/registro-deteccao/registro-execucoes.xlsx) mantém três abas: Execuções, Resumo por repetição e Comparação dos modelos. São 150 linhas de coleta: dez arquivos × três modelos × cinco repetições. A coluna Problemas detectados recebe identificadores únicos separados por ponto e vírgula, ou o travessão quando não houver detecção esperada. FP = 0 precisa ser preenchido quando não houver apontamento indevido; FP em branco indica classificação incompleta.
+A [planilha](../outputs/registro-deteccao/registro-execucoes.xlsx) mantém três abas: Execuções, Resumo por repetição e Comparação dos modelos. São 150 linhas de coleta: dez arquivos × três modelos × cinco repetições. A coluna Problemas detectados recebe identificadores únicos separados por ponto e vírgula, ou o travessão quando não houver detecção esperada. O campo FP registra o total de apontamentos distintos sem correspondência com a referência. O valor zero indica ausência desses apontamentos. FP em branco indica classificação incompleta.
 
 O arquivo foi adaptado para importação no Google Planilhas. O [guia de uso](../outputs/registro-deteccao/README.md) explica a importação, os menus dependentes do código e a conferência dos resultados antes da coleta.
 
-A precisão, a revocação e F1 são calculadas pelas contagens. Precisão sem VP nem FP é indefinida. Revocação e F1 são zero quando nenhum dos três itens é detectado, inclusive sem apontamentos. O resumo soma as contagens dos dez códigos antes de calcular as métricas; apenas rodadas completas, sem duplicação, alimentam a comparação dos modelos. O desvio padrão amostral de F1 exige duas rodadas completas.
+A precisão é a proporção dos apontamentos contabilizados que correspondem à referência. A revocação é a proporção dos problemas esperados que foram reconhecidos. A medida F1 combina as duas pela média harmônica. A precisão e a medida F1 expressam o desempenho em relação à referência, pois a validade dos apontamentos sem correspondência não foi avaliada separadamente.
+
+Precisão sem VP nem FP é indefinida. Revocação e F1 são zero quando nenhum dos três itens é detectado, inclusive sem apontamentos. O resumo soma as contagens dos dez códigos antes de calcular as métricas. Apenas rodadas completas, sem duplicação, alimentam a comparação dos modelos. O desvio padrão amostral de F1 exige duas rodadas completas.
 
 A tabela de frequência contém **90 combinações problema/modelo**. Somente execuções classificadas, com FP preenchido, modelo/código válidos e repetição de 1 a 5 são consideradas. Duplicações da combinação modelo/código/repetição são excluídas até correção. Sem execuções avaliadas, a frequência permanece em branco. Uma frequência de 5/5 significa detecção nas cinco repetições; 0/5 significa omissão em todas.
 
-O [protocolo](../protocolo.md) detalha entradas, ambiente, respostas, falhas técnicas e classificação. Conforme o capítulo orientador, a identificação dos modelos permanece disponível à pessoa que classifica e à equipe revisora. Respostas, metadados e eventuais tentativas técnicas devem ser preservados por identificador de execução.
+O [protocolo](../protocolo.md) detalha entradas, ambiente, respostas, falhas técnicas e classificação. Conforme o capítulo orientador, a identificação dos modelos permanece disponível à pessoa que classifica e à equipe revisora. O protocolo prevê a preservação das respostas, dos metadados e de eventuais tentativas técnicas por identificador de execução.

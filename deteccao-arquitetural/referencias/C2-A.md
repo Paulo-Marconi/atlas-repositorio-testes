@@ -25,9 +25,9 @@
 - **Fundamentação:** [DIP (Martin)][S3], [Inappropriate Static][S8].
 - **Decisão ou fragilidade observável:** PayrollService recebe WorkLedger e consulta diretamente WorkLedger.minutesFor. A operação estática específica acessa os registros privados da implementação, fixando a fonte de consulta do consumidor.
 - **Elementos e evidências:** Consulta estática e registros por instância: [linhas 10–25](../codigos/C2-A.ts#L10-L25); Consumidor da consulta: [linhas 27–38](../codigos/C2-A.ts#L27-L38).
-- **Critério mínimo de detecção:** localizar a ligação fixa entre consumidor e consulta estática e reconhecer dificuldade de substituição ou isolamento.
+- **Critério mínimo de detecção:** A resposta localiza a ligação fixa entre o consumidor e a consulta estática e reconhece a dificuldade de substituição ou isolamento.
 - **Formulações equivalentes aceitas:** acoplamento estático, DIP, Static Cling, Inappropriate Static ou dependência concreta da consulta.
-- **Afirmações insuficientes:** Mencionar new, static, instanceof ou ausência de interface sem localizar o vínculo e sua restrição de substituição.
+- **Afirmações insuficientes:** A menção a new, static, instanceof ou à ausência de interface é insuficiente sem a identificação do vínculo e da restrição de substituição.
 - **Distinção e contagem:** passar um contrato de consulta ao serviço não altera a criação interna do lote nem a API concreta de armazenamento. A mera existência de static não basta.
 
 ### C2-A-02 — Construção interna de colaborador
@@ -45,10 +45,10 @@
 - **Fundamentação:** [DIP (Martin)][S3].
 - **Decisão ou fragilidade observável:** PayrollBatch.process escolhe e constrói PayrollService dentro do processamento. O chamador do lote não fornece um emissor ou uma fábrica substituível.
 - **Elementos e evidências:** Construção do serviço no lote: [linhas 40–47](../codigos/C2-A.ts#L40-L47).
-- **Critério mínimo de detecção:** relacionar essa construção à fixação da implementação de emissão no lote e à dificuldade de trocá-la ou isolá-la.
+- **Critério mínimo de detecção:** A resposta relaciona essa construção à escolha fixa da implementação de emissão no lote e à dificuldade de substituí-la ou isolá-la.
 - **Formulações equivalentes aceitas:** dependência concreta, construção interna, acoplamento do lote ou falta de substituição do colaborador.
-- **Afirmações insuficientes:** Mencionar new, static, instanceof ou ausência de interface sem localizar o vínculo e sua restrição de substituição.
-- **Distinção e contagem:** permitir receber o emissor no lote não reorganiza as dependências internas desse emissor. Não contar a instanciação e a chamada seguinte como dois itens.
+- **Afirmações insuficientes:** A menção a new, static, instanceof ou à ausência de interface é insuficiente sem a identificação do vínculo e da restrição de substituição.
+- **Distinção e contagem:** A possibilidade de receber o emissor no lote mantém as dependências internas desse emissor. A instanciação e a chamada seguinte compõem um único item.
 
 ### C2-A-03 — Dependência de API concreta de armazenamento
 
@@ -65,10 +65,10 @@
 - **Fundamentação:** [DIP (Martin)][S3].
 - **Decisão ou fragilidade observável:** PayrollService prepara a representação CSV e chama CsvPayslipArchive.appendCsvRow. A política de emissão conhece o formato e a API técnica de persistência, em vez de um contrato de gravação orientado ao domínio.
 - **Elementos e evidências:** API do arquivo CSV: [linhas 3–8](../codigos/C2-A.ts#L3-L8); Representação e chamada no emissor: [linhas 27–38](../codigos/C2-A.ts#L27-L38).
-- **Critério mínimo de detecção:** reconhecer que o consumidor depende do detalhe concreto de persistência e precisa mudar para adotar uma alternativa com outro contrato de armazenamento.
+- **Critério mínimo de detecção:** A resposta reconhece que o consumidor depende do detalhe concreto de persistência e precisa mudar para adotar uma alternativa com outro contrato de armazenamento.
 - **Formulações equivalentes aceitas:** dependência de infraestrutura, acoplamento ao formato/API concreta, DIP ou persistência não isolada.
-- **Afirmações insuficientes:** Mencionar new, static, instanceof ou ausência de interface sem localizar o vínculo e sua restrição de substituição.
-- **Distinção e contagem:** introduzir um contrato de armazenamento orientado ao domínio deixa a consulta estática e a construção no lote presentes. Tipar uma classe concreta, por si só, não é evidência suficiente em TypeScript; mostrar a ligação ao contrato técnico. Serialização e API específica integram um item.
+- **Afirmações insuficientes:** A menção a new, static, instanceof ou à ausência de interface é insuficiente sem a identificação do vínculo e da restrição de substituição.
+- **Distinção e contagem:** A introdução de um contrato de armazenamento orientado ao domínio deixa presentes a consulta estática e a construção no lote. A evidência relevante é a ligação ao contrato técnico. O uso de uma classe concreta como tipo é insuficiente por si só em TypeScript. A serialização e a API específica compõem um único item.
 
 ## Fontes
 

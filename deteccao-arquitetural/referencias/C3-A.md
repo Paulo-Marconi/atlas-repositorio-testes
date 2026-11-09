@@ -25,9 +25,9 @@
 - **Fundamentação:** [Indecent Exposure][S10].
 - **Decisão ou fragilidade observável:** Wallet expõe balanceCents e spendingBlocked para escrita direta, embora suas operações coordenem validações, movimentações e retenção. applyAdjustment utiliza um desses caminhos externos.
 - **Elementos e evidências:** Campos públicos e construção: [linhas 4–15](../codigos/C3-A.ts#L4-L15); Operações e bloqueio: [linhas 23–31](../codigos/C3-A.ts#L23-L31); Escrita externa: [linhas 50–52](../codigos/C3-A.ts#L50-L52).
-- **Critério mínimo de detecção:** localizar um desses caminhos de escrita e reconhecer que expõe estado ou contorna as operações responsáveis por mantê-lo consistente. Não exigir enumerar ambos os campos ou todas as consequências.
+- **Critério mínimo de detecção:** A resposta localiza um desses caminhos de escrita e reconhece que ele expõe o estado ou contorna as operações responsáveis por mantê-lo consistente. A enumeração dos dois campos ou de todas as consequências é opcional.
 - **Formulações equivalentes aceitas:** estado público mutável, encapsulamento inadequado, invariantes contornáveis ou Indecent Exposure.
-- **Afirmações insuficientes:** Citar public, readonly ou mutabilidade sem localizar a fronteira que permite alterar o estado fora das operações previstas.
+- **Afirmações insuficientes:** A menção a public, readonly ou à mutabilidade é insuficiente sem a identificação da fronteira que permite alterar o estado fora das operações previstas.
 - **Distinção e contagem:** encapsular os campos não elimina a referência devolvida nem a política mutável retida. Saldo e bloqueio pertencem ao mesmo item de exposição direta.
 
 ### C3-A-02 — Referência mutável devolvida
@@ -45,9 +45,9 @@
 - **Fundamentação:** [Indecent Exposure][S10], [Cópia defensiva de referências mutáveis (SEI CERT OBJ06-J)][S16].
 - **Decisão ou fragilidade observável:** Wallet.history devolve o próprio array privado de movimentações. Seu consumidor pode alterar a coleção ou seus elementos sem passar pelas operações da carteira.
 - **Elementos e evidências:** Coleção privada: [linhas 5–5](../codigos/C3-A.ts#L5-L5); Retorno da referência interna: [linhas 33–33](../codigos/C3-A.ts#L33-L33).
-- **Critério mínimo de detecção:** identificar o retorno como uma referência ao estado interno e reconhecer a possibilidade de alteração externa. Não exigir um exemplo específico de lançamento corrompido.
+- **Critério mínimo de detecção:** A resposta identifica o retorno como referência ao estado interno e reconhece a possibilidade de alteração externa. Um exemplo específico de lançamento corrompido é opcional.
 - **Formulações equivalentes aceitas:** vazamento de referência, coleção interna exposta, encapsulamento inadequado no retorno ou histórico modificável externamente.
-- **Afirmações insuficientes:** Citar public, readonly ou mutabilidade sem localizar a fronteira que permite alterar o estado fora das operações previstas.
+- **Afirmações insuficientes:** A menção a public, readonly ou à mutabilidade é insuficiente sem a identificação da fronteira que permite alterar o estado fora das operações previstas.
 - **Distinção e contagem:** devolver uma representação independente, incluindo os elementos necessários, deixa a escrita nos campos e a referência de entrada intactas. Coleção e elementos desse retorno não geram acertos separados.
 
 ### C3-A-03 — Entrada mutável retida por referência
@@ -65,10 +65,10 @@
 - **Fundamentação:** [Indecent Exposure][S10], [Cópia defensiva de referências mutáveis (SEI CERT OBJ06-J)][S16].
 - **Decisão ou fragilidade observável:** O construtor de Wallet valida WalletPolicy e guarda o mesmo objeto recebido. A alteração posterior pelo chamador muda o limite usado por withdraw, sem repetir a validação inicial.
 - **Elementos e evidências:** Entrada retida e validada: [linhas 9–15](../codigos/C3-A.ts#L9-L15); Uso da política na retirada: [linhas 23–31](../codigos/C3-A.ts#L23-L31).
-- **Critério mínimo de detecção:** relacionar o objeto recebido e retido à possibilidade de mudar o estado interno por um alias externo, apesar do campo privado.
+- **Critério mínimo de detecção:** A resposta relaciona a retenção do objeto recebido à possibilidade de alterar o estado interno por uma referência externa ao mesmo objeto, apesar de o campo ser privado.
 - **Formulações equivalentes aceitas:** entrada mutável compartilhada, falta de isolamento da política, vazamento por referência recebida ou insuficiência de readonly para proteger o objeto.
-- **Afirmações insuficientes:** Citar public, readonly ou mutabilidade sem localizar a fronteira que permite alterar o estado fora das operações previstas.
-- **Distinção e contagem:** copiar os valores de configuração ao recebê-los deixa os campos públicos e o retorno de history inalterados. O item é a fronteira de entrada; não pontuar validação inicial e mutação posterior separadamente.
+- **Afirmações insuficientes:** A menção a public, readonly ou à mutabilidade é insuficiente sem a identificação da fronteira que permite alterar o estado fora das operações previstas.
+- **Distinção e contagem:** A cópia dos valores de configuração no recebimento deixa os campos públicos e o retorno de history inalterados. A validação inicial e a mutação posterior se relacionam à mesma fronteira de entrada e compõem um único item.
 
 ## Fontes
 

@@ -25,9 +25,9 @@
 - **Fundamentação:** [OCP (Martin)][S4], [Combinatorial Explosion][S12].
 - **Decisão ou fragilidade observável:** DeliveryPricing implementa as combinações de modalidade e região em métodos separados. quoteDeliveryOptions também enumera essas combinações para compor o resultado.
 - **Elementos e evidências:** Matriz de tarifas: [linhas 4–40](../codigos/C4-B.ts#L4-L40); Enumeração na composição da cotação: [linhas 70–87](../codigos/C4-B.ts#L70-L87).
-- **Critério mínimo de detecção:** identificar os eixos e relacionar a matriz ao crescimento das operações ou dos pontos alterados ao ampliar as alternativas.
+- **Critério mínimo de detecção:** A resposta identifica os eixos e relaciona a matriz ao aumento no número de operações ou de pontos que mudam quando se acrescentam alternativas.
 - **Formulações equivalentes aceitas:** explosão combinatória, variações combinadas sem composição, OCP ou Combinatorial Explosion.
-- **Afirmações insuficientes:** Citar um switch ou um conjunto finito de opções sem reconhecer os pontos de mudança necessários para ampliar o comportamento.
+- **Afirmações insuficientes:** A menção a um switch ou a um conjunto finito de opções é insuficiente sem o reconhecimento dos pontos que precisam mudar para ampliar o comportamento.
 - **Distinção e contagem:** separar as políticas de modalidade e região não torna extensíveis desconto ou embalagem. A enumeração e a repetição das fórmulas são evidências do mesmo item.
 
 ### C4-B-02 — Despacho central fechado
@@ -45,10 +45,10 @@
 - **Fundamentação:** [OCP (Martin)][S4], [Protected Variations (Larman)][S5], [Conditional Complexity][S11].
 - **Decisão ou fragilidade observável:** ShippingDiscount.apply concentra as políticas dos níveis de cliente num despacho central. Incluir outra política exige alterar a união CustomerTier e a implementação existente.
 - **Elementos e evidências:** Alternativas de desconto: [linhas 1–1](../codigos/C4-B.ts#L1-L1); Despacho de descontos: [linhas 42–50](../codigos/C4-B.ts#L42-L50).
-- **Critério mínimo de detecção:** localizar a seleção fixa e reconhecer seu custo para incluir ou substituir um comportamento de desconto.
+- **Critério mínimo de detecção:** A resposta localiza a seleção fixa e reconhece o custo de incluir ou substituir um comportamento de desconto.
 - **Formulações equivalentes aceitas:** políticas sem ponto de extensão, OCP, despacho fechado ou Conditional Complexity.
-- **Afirmações insuficientes:** Citar um switch ou um conjunto finito de opções sem reconhecer os pontos de mudança necessários para ampliar o comportamento.
-- **Distinção e contagem:** receber uma política substituível não elimina a matriz de modalidade/região ou os despachos de embalagem. Não exigir julgar percentuais ou sustentar que todo switch é inadequado.
+- **Afirmações insuficientes:** A menção a um switch ou a um conjunto finito de opções é insuficiente sem o reconhecimento dos pontos que precisam mudar para ampliar o comportamento.
+- **Distinção e contagem:** Uma política de desconto substituível mantém a matriz de modalidade e região e os despachos de embalagem. A detecção depende da identificação do custo de extensão. O julgamento dos percentuais e a crítica ao uso de switch são dispensáveis.
 
 ### C4-B-03 — Seleção de comportamento repetida
 
@@ -65,9 +65,9 @@
 - **Fundamentação:** [OCP (Martin)][S4], [Protected Variations (Larman)][S5], [Conditional Complexity][S11].
 - **Decisão ou fragilidade observável:** PackagingPolicy repete a escolha da embalagem para definir adicional e descrição. Uma nova categoria exige mudanças coordenadas nas duas operações e na união Packaging.
 - **Elementos e evidências:** Eixo de embalagem: [linhas 2–2](../codigos/C4-B.ts#L2-L2); Seleção repetida de embalagem: [linhas 52–68](../codigos/C4-B.ts#L52-L68).
-- **Critério mínimo de detecção:** reconhecer o eixo repetido e a necessidade de alterar mais de uma operação ao acrescentar uma categoria.
+- **Critério mínimo de detecção:** A resposta reconhece a repetição da seleção por embalagem e a necessidade de alterar mais de uma operação quando se acrescenta uma categoria.
 - **Formulações equivalentes aceitas:** seleção espalhada, regras fechadas de embalagem, OCP ou alterações coordenadas para extensão.
-- **Afirmações insuficientes:** Citar um switch ou um conjunto finito de opções sem reconhecer os pontos de mudança necessários para ampliar o comportamento.
+- **Afirmações insuficientes:** A menção a um switch ou a um conjunto finito de opções é insuficiente sem o reconhecimento dos pontos que precisam mudar para ampliar o comportamento.
 - **Distinção e contagem:** encapsular um comportamento de embalagem não corrige tarifas por combinação ou descontos centrais. Os despachos de preço e descrição formam um item; seus nomes são apenas localização.
 
 ## Fontes

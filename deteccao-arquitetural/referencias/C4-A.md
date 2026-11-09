@@ -25,9 +25,9 @@
 - **Fundamentação:** [OCP (Martin)][S4], [Protected Variations (Larman)][S5], [Conditional Complexity][S11].
 - **Decisão ou fragilidade observável:** DataExporter repete a escolha entre formatos em encode, contentType e extension. Acrescentar um formato exige alterar a união e as três decisões existentes.
 - **Elementos e evidências:** Seleção repetida do formato: [linhas 44–73](../codigos/C4-A.ts#L44-L73).
-- **Critério mínimo de detecção:** localizar o eixo de formato e reconhecer que incluir outra alternativa exige alterar vários pontos existentes.
+- **Critério mínimo de detecção:** A resposta localiza a seleção por formato e reconhece que acrescentar outro formato exige alterar vários pontos existentes.
 - **Formulações equivalentes aceitas:** seleção repetida, condicionais espalhados, OCP, custo de extensão ou ausência de proteção da variação.
-- **Afirmações insuficientes:** Citar um switch ou um conjunto finito de opções sem reconhecer os pontos de mudança necessários para ampliar o comportamento.
+- **Afirmações insuficientes:** A menção a um switch ou a um conjunto finito de opções é insuficiente sem o reconhecimento dos pontos que precisam mudar para ampliar o comportamento.
 - **Distinção e contagem:** encapsular uma estratégia de formato deixa a seleção de transformações e a matriz de ordenação presentes. Os três despachos do mesmo formato formam um item.
 
 ### C4-A-02 — Despacho central fechado
@@ -45,10 +45,10 @@
 - **Fundamentação:** [OCP (Martin)][S4], [Protected Variations (Larman)][S5], [Conditional Complexity][S11].
 - **Decisão ou fragilidade observável:** RowTransform mantém a lista de transformações na união, no reconhecimento da entrada e no despacho de execução. Outra transformação requer modificar esses pontos centrais.
 - **Elementos e evidências:** Reconhecimento e execução das transformações: [linhas 7–24](../codigos/C4-A.ts#L7-L24).
-- **Critério mínimo de detecção:** reconhecer a inclusão de comportamento como uma modificação da implementação central e localizar o mecanismo em RowTransform.
+- **Critério mínimo de detecção:** A resposta localiza o mecanismo em RowTransform e reconhece que acrescentar um comportamento exige alterar a implementação central.
 - **Formulações equivalentes aceitas:** despacho fechado, transformações sem ponto de extensão, OCP ou Conditional Complexity.
-- **Afirmações insuficientes:** Citar um switch ou um conjunto finito de opções sem reconhecer os pontos de mudança necessários para ampliar o comportamento.
-- **Distinção e contagem:** permitir receber/registrar uma transformação não altera formatos ou ordenação. Não pressupor que qualquer conjunto finito de opções precisa ser extensível; pontuar o custo verificável, inclusive quando a resposta aceita esse custo como escolha atual.
+- **Afirmações insuficientes:** A menção a um switch ou a um conjunto finito de opções é insuficiente sem o reconhecimento dos pontos que precisam mudar para ampliar o comportamento.
+- **Distinção e contagem:** A possibilidade de receber ou registrar uma transformação mantém as decisões sobre formato e ordenação. A contagem considera o custo verificável de extensão, inclusive quando a resposta aceita esse custo como escolha atual. Um conjunto finito de opções, por si só, é evidência insuficiente.
 
 ### C4-A-03 — Multiplicação de operações por combinações
 
@@ -65,10 +65,10 @@
 - **Fundamentação:** [OCP (Martin)][S4], [Combinatorial Explosion][S12].
 - **Decisão ou fragilidade observável:** RowOrdering oferece uma operação para cada combinação de chave e direção e enumera as alternativas em order. Acrescentar uma chave ou direção amplia essa matriz de métodos e chamadas.
 - **Elementos e evidências:** Matriz de operações de ordenação: [linhas 26–42](../codigos/C4-A.ts#L26-L42).
-- **Critério mínimo de detecção:** reconhecer os dois eixos e a multiplicação de operações ou mudanças coordenadas necessárias para ampliá-los.
+- **Critério mínimo de detecção:** A resposta reconhece os dois eixos e identifica a multiplicação de operações ou as mudanças coordenadas necessárias para ampliá-los.
 - **Formulações equivalentes aceitas:** explosão combinatória, matriz fixa de comportamentos, Combinatorial Explosion ou dificuldade de extensão por combinações.
-- **Afirmações insuficientes:** Citar um switch ou um conjunto finito de opções sem reconhecer os pontos de mudança necessários para ampliar o comportamento.
-- **Distinção e contagem:** compor comparador e direção deixa os itens de formato e transformação presentes. Ordenar registros, transformar seus valores e codificar a saída são eixos separados; não exigir seus nomes exatos na resposta.
+- **Afirmações insuficientes:** A menção a um switch ou a um conjunto finito de opções é insuficiente sem o reconhecimento dos pontos que precisam mudar para ampliar o comportamento.
+- **Distinção e contagem:** A composição do comparador e da direção deixa presentes os itens de formato e transformação. A ordenação dos registros, a transformação de seus valores e a codificação da saída são eixos separados. Os nomes exatos desses eixos são opcionais.
 
 ## Fontes
 

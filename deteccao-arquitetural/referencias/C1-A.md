@@ -25,10 +25,10 @@
 - **Fundamentação:** [SRP (Martin)][S2], [Divergent Change][S6].
 - **Decisão ou fragilidade observável:** SalesReport implementa armazenamento e interpretação de documentos, cálculo de vendas e apresentação textual. Mudanças nessas decisões atingem a mesma classe.
 - **Elementos e evidências:** SalesReport: persistência, cálculo e apresentação: [linhas 9–46](../codigos/C1-A.ts#L9-L46).
-- **Critério mínimo de detecção:** reconhecer a concentração de pelo menos duas dessas responsabilidades na classe ou operação e relacioná-la à baixa coesão ou a motivos independentes de mudança.
+- **Critério mínimo de detecção:** A resposta reconhece a concentração de pelo menos duas dessas responsabilidades na classe ou operação e a relaciona à baixa coesão ou a motivos independentes de mudança.
 - **Formulações equivalentes aceitas:** SRP, baixa coesão, acúmulo de responsabilidades ou Divergent Change com essa evidência.
-- **Afirmações insuficientes:** Quantidade de métodos ou descrição do fluxo sem reconhecer responsabilidades independentes ou a regra dispersa.
-- **Distinção e contagem:** separar apresentação ou persistência deixa intactos o acúmulo de políticas da unidade do item 02 e a regra duplicada do item 03. Não pontuar cada responsabilidade como um problema diferente.
+- **Afirmações insuficientes:** A quantidade de métodos ou a descrição do fluxo é insuficiente quando a resposta deixa de reconhecer as responsabilidades independentes ou a regra dispersa.
+- **Distinção e contagem:** A separação da apresentação ou da persistência deixa presentes o acúmulo de políticas da unidade do item 02 e a regra duplicada do item 03. As responsabilidades concentradas na mesma unidade compõem um único item.
 
 ### C1-A-02 — Políticas independentes na mesma classe
 
@@ -45,9 +45,9 @@
 - **Fundamentação:** [SRP (Martin)][S2], [Divergent Change][S6].
 - **Decisão ou fragilidade observável:** ReportAccount mantém permissões de leitura e regras financeiras de cobrança/pagamento. Os dois grupos possuem estado e operações próprios na mesma unidade.
 - **Elementos e evidências:** ReportAccount: acesso e cobrança: [linhas 48–71](../codigos/C1-A.ts#L48-L71).
-- **Critério mínimo de detecção:** reconhecer as duas políticas na mesma unidade e sua concentração como fragilidade de responsabilidade ou coesão. Não exigir discutir autenticação segura ou critérios financeiros.
+- **Critério mínimo de detecção:** A resposta identifica as duas políticas na mesma unidade e reconhece sua concentração como fragilidade de responsabilidade ou coesão. A discussão sobre segurança da autenticação ou critérios financeiros é opcional.
 - **Formulações equivalentes aceitas:** mistura de políticas, baixa coesão, SRP ou responsabilidades independentes acumuladas.
-- **Afirmações insuficientes:** Quantidade de métodos ou descrição do fluxo sem reconhecer responsabilidades independentes ou a regra dispersa.
+- **Afirmações insuficientes:** A quantidade de métodos ou a descrição do fluxo é insuficiente quando a resposta deixa de reconhecer as responsabilidades independentes ou a regra dispersa.
 - **Distinção e contagem:** extrair a responsabilidade de acesso mantém o item 01 e a duplicação da política comercial do item 03. Usar a mesma política em um orquestrador por delegação não deve reproduzir o defeito.
 
 ### C1-A-03 — Responsabilidade de regra dispersa
@@ -65,9 +65,9 @@
 - **Fundamentação:** [Shotgun Surgery][S7].
 - **Decisão ou fragilidade observável:** ReportAccount.chargeSubscription e SubscriptionPreview.quote implementam separadamente a mesma regra de cobrança por assinatura e quantidade de assentos. Uma alteração dessa política exige manter as duas implementações alinhadas.
 - **Elementos e evidências:** Cobrança da assinatura: [linhas 56–61](../codigos/C1-A.ts#L56-L61); Previsão da mesma cobrança: [linhas 73–78](../codigos/C1-A.ts#L73-L78).
-- **Critério mínimo de detecção:** localizar a regra repetida nas unidades e reconhecer que sua alteração exige atualizações coordenadas ou pode produzir divergência.
+- **Critério mínimo de detecção:** A resposta localiza a regra repetida nas unidades e reconhece a necessidade de atualizações coordenadas ou o risco de divergência quando a regra muda.
 - **Formulações equivalentes aceitas:** responsabilidade dispersa, duplicação de regra de negócio, Shotgun Surgery ou ausência de um responsável pela política.
-- **Afirmações insuficientes:** Quantidade de métodos ou descrição do fluxo sem reconhecer responsabilidades independentes ou a regra dispersa.
+- **Afirmações insuficientes:** A quantidade de métodos ou a descrição do fluxo é insuficiente quando a resposta deixa de reconhecer as responsabilidades independentes ou a regra dispersa.
 - **Distinção e contagem:** centralizar a regra não separa cobrança de acesso nem reorganiza SalesReport. As cópias e seus efeitos formam um único item. Repetição acidental de sintaxe não basta.
 
 ## Fontes

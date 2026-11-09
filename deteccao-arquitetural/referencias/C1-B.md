@@ -25,9 +25,9 @@
 - **Fundamentação:** [SRP (Martin)][S2], [Divergent Change][S6].
 - **Decisão ou fragilidade observável:** AdmissionOffice implementa regras de admissão e bolsa, mantém matrículas e notificações e apresenta a carteirinha do aluno. Essas responsabilidades estão implementadas na própria classe.
 - **Elementos e evidências:** AdmissionOffice: [linhas 11–56](../codigos/C1-B.ts#L11-L56).
-- **Critério mínimo de detecção:** identificar a unidade, pelo menos duas responsabilidades e a concentração ou baixa coesão decorrente.
+- **Critério mínimo de detecção:** A resposta identifica a unidade e pelo menos duas responsabilidades, além de reconhecer a concentração ou a baixa coesão decorrente.
 - **Formulações equivalentes aceitas:** SRP, baixa coesão, Divergent Change ou mistura de regras e infraestrutura/apresentação.
-- **Afirmações insuficientes:** Quantidade de métodos ou descrição do fluxo sem reconhecer responsabilidades independentes ou a regra dispersa.
+- **Afirmações insuficientes:** A quantidade de métodos ou a descrição do fluxo é insuficiente quando a resposta deixa de reconhecer as responsabilidades independentes ou a regra dispersa.
 - **Distinção e contagem:** separar apresentação ou persistência não elimina os itens de StudentAccount e da política duplicada. A coordenação simples de colaboradores não será pontuada como esse item.
 
 ### C1-B-02 — Políticas independentes na mesma classe
@@ -45,9 +45,9 @@
 - **Fundamentação:** [SRP (Martin)][S2], [Divergent Change][S6].
 - **Decisão ou fragilidade observável:** StudentAccount reúne saldo de mensalidades e operações de cobrança/pagamento com credenciais, tentativas de autenticação e bloqueio de acesso.
 - **Elementos e evidências:** StudentAccount: finanças e acesso: [linhas 58–94](../codigos/C1-B.ts#L58-L94).
-- **Critério mínimo de detecção:** reconhecer a concentração das responsabilidades financeiras e de acesso nessa unidade. Não exigir localizar todas as operações, avaliar criptografia ou provar uma falha funcional.
+- **Critério mínimo de detecção:** A resposta reconhece a concentração das responsabilidades financeiras e de acesso nessa unidade. A localização de todas as operações, a avaliação da criptografia e a demonstração de uma falha funcional são opcionais.
 - **Formulações equivalentes aceitas:** políticas independentes reunidas, baixa coesão, SRP ou mistura de finanças e autenticação.
-- **Afirmações insuficientes:** Quantidade de métodos ou descrição do fluxo sem reconhecer responsabilidades independentes ou a regra dispersa.
+- **Afirmações insuficientes:** A quantidade de métodos ou a descrição do fluxo é insuficiente quando a resposta deixa de reconhecer as responsabilidades independentes ou a regra dispersa.
 - **Distinção e contagem:** extrair autenticação deixa a regra de mensalidade duplicada do item 03 e o desenho de AdmissionOffice presentes.
 
 ### C1-B-03 — Responsabilidade de regra dispersa
@@ -65,10 +65,10 @@
 - **Fundamentação:** [Shotgun Surgery][S7].
 - **Decisão ou fragilidade observável:** StudentAccount.chargeTuition e EnrollmentQuote.quote calculam a mesma mensalidade com bolsa em implementações distintas. A regra compartilhada não possui um único responsável.
 - **Elementos e evidências:** Cobrança da mensalidade: [linhas 65–69](../codigos/C1-B.ts#L65-L69); Previsão da mensalidade: [linhas 96–101](../codigos/C1-B.ts#L96-L101).
-- **Critério mínimo de detecção:** localizar as duas implementações e reconhecer duplicação da política, necessidade de alterações coordenadas ou risco de divergência entre elas.
+- **Critério mínimo de detecção:** A resposta localiza as duas implementações e reconhece a duplicação da política, a necessidade de alterações coordenadas ou o risco de divergência entre elas.
 - **Formulações equivalentes aceitas:** regra espalhada, duplicação de negócio, Shotgun Surgery ou responsabilidade de cálculo distribuída inadequadamente.
-- **Afirmações insuficientes:** Quantidade de métodos ou descrição do fluxo sem reconhecer responsabilidades independentes ou a regra dispersa.
-- **Distinção e contagem:** extrair o cálculo comum deixa a mistura financeira/autenticação e o acúmulo de AdmissionOffice. Não converter cada cópia ou consequência em outro item.
+- **Afirmações insuficientes:** A quantidade de métodos ou a descrição do fluxo é insuficiente quando a resposta deixa de reconhecer as responsabilidades independentes ou a regra dispersa.
+- **Distinção e contagem:** A extração do cálculo comum deixa presentes a concentração das responsabilidades financeiras e de autenticação e o acúmulo de responsabilidades em AdmissionOffice. As cópias e suas consequências compõem um único item.
 
 ## Fontes
 

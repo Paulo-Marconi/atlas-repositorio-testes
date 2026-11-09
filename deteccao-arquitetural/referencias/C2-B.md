@@ -25,9 +25,9 @@
 - **Fundamentação:** [Base Class depends on Subclass][S9].
 - **Decisão ou fragilidade observável:** Delivery.dispatchLabel inspeciona seus derivados concretos com instanceof e acessa dados específicos de cada tipo. Um novo derivado não é atendido sem alterar essa decisão na base.
 - **Elementos e evidências:** Base e referências aos derivados: [linhas 1–12](../codigos/C2-B.ts#L1-L12).
-- **Critério mínimo de detecção:** identificar a dependência da base em tipos derivados concretos, com reconhecimento da inversão da direção de conhecimento ou da necessidade de alterar a base ao acrescentar um derivado.
+- **Critério mínimo de detecção:** A resposta identifica a dependência da classe base em relação a tipos derivados concretos e reconhece a inversão da direção da dependência ou a necessidade de alterar a base para acrescentar um derivado.
 - **Formulações equivalentes aceitas:** base acoplada a subclasses, ausência de polimorfismo, Base Class depends on Subclass ou custo de extensão da base.
-- **Afirmações insuficientes:** Mencionar new, static, instanceof ou ausência de interface sem localizar o vínculo e sua restrição de substituição.
+- **Afirmações insuficientes:** A menção a new, static, instanceof ou à ausência de interface é insuficiente sem a identificação do vínculo e da restrição de substituição.
 - **Distinção e contagem:** deslocar o comportamento para os derivados não substitui a impressora do serviço nem o serviço escolhido pelo lote. Ausência de polimorfismo e custo de extensão são um item.
 
 ### C2-B-02 — Construção interna de colaborador
@@ -45,9 +45,9 @@
 - **Fundamentação:** [DIP (Martin)][S3].
 - **Decisão ou fragilidade observável:** DispatchService constrói ThermalPrinter e chama printEscPos. O consumidor fica vinculado à implementação e à API específica de impressão.
 - **Elementos e evidências:** Implementação e API de impressão: [linhas 39–43](../codigos/C2-B.ts#L39-L43); Escolha da impressora no serviço: [linhas 45–51](../codigos/C2-B.ts#L45-L51).
-- **Critério mínimo de detecção:** identificar a escolha fixa da impressora/API pelo consumidor e a dificuldade de substituí-la ou isolá-la.
+- **Critério mínimo de detecção:** A resposta identifica a escolha fixa da impressora ou da API pelo consumidor e a dificuldade de substituí-la ou isolá-la.
 - **Formulações equivalentes aceitas:** acoplamento concreto à impressão, DIP, construção interna ou tecnologia de impressão fixa.
-- **Afirmações insuficientes:** Mencionar new, static, instanceof ou ausência de interface sem localizar o vínculo e sua restrição de substituição.
+- **Afirmações insuficientes:** A menção a new, static, instanceof ou à ausência de interface é insuficiente sem a identificação do vínculo e da restrição de substituição.
 - **Distinção e contagem:** receber um contrato de impressão não altera a dependência da base nos derivados nem oferece substituição do serviço no lote. Construção e chamada específica contam juntas.
 
 ### C2-B-03 — Construção interna do serviço de aplicação
@@ -65,10 +65,10 @@
 - **Fundamentação:** [DIP (Martin)][S3].
 - **Decisão ou fragilidade observável:** DispatchBatch.printAll constrói DispatchService dentro do lote. O chamador não pode fornecer outra implementação de despacho para esse processamento.
 - **Elementos e evidências:** Serviço escolhido no lote: [linhas 53–58](../codigos/C2-B.ts#L53-L58).
-- **Critério mínimo de detecção:** reconhecer a fronteira lote–serviço como uma escolha concreta que impede ao chamador substituir ou isolar o despacho.
+- **Critério mínimo de detecção:** A resposta reconhece que a escolha concreta do serviço pelo lote impede que o chamador substitua ou isole o despacho.
 - **Formulações equivalentes aceitas:** lote acoplado ao serviço, colaborador criado internamente, dependência concreta ou DIP.
-- **Afirmações insuficientes:** Mencionar new, static, instanceof ou ausência de interface sem localizar o vínculo e sua restrição de substituição.
-- **Distinção e contagem:** injetar um despachante no lote mantém a impressora fixa dentro da implementação existente; injetar apenas a impressora no serviço mantém a construção do serviço pelo lote. Exigir localização dessas fronteiras para dois acertos.
+- **Afirmações insuficientes:** A menção a new, static, instanceof ou à ausência de interface é insuficiente sem a identificação do vínculo e da restrição de substituição.
+- **Distinção e contagem:** A injeção de um despachante no lote mantém a impressora fixa dentro da implementação existente. A injeção apenas da impressora no serviço mantém a construção do serviço pelo lote. Dois acertos exigem que a resposta localize as duas fronteiras.
 
 ## Fontes
 

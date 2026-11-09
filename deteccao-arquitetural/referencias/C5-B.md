@@ -25,9 +25,9 @@
 - **Fundamentação:** [Global Data][S13], [Hidden Dependencies][S14].
 - **Decisão ou fragilidade observável:** ReceiptBuilder resolve fonte e moeda por receiptEnvironment, configurado externamente e compartilhado no módulo. A operação depende dessa inicialização e da configuração corrente.
 - **Elementos e evidências:** Ambiente e configuração: [linhas 5–10](../codigos/C5-B.ts#L5-L10); Resolução das dependências na geração: [linhas 15–26](../codigos/C5-B.ts#L15-L26).
-- **Critério mínimo de detecção:** identificar a resolução implícita dessas dependências e reconhecer inicialização obrigatória, dependência da ordem ou dificuldade de isolamento.
+- **Critério mínimo de detecção:** A resposta identifica como as dependências são obtidas de forma implícita e reconhece a inicialização obrigatória, a dependência da ordem ou a dificuldade de isolamento.
 - **Formulações equivalentes aceitas:** ambiente global, dependências ocultas, service locator nesse vínculo ou configuração compartilhada.
-- **Afirmações insuficientes:** Criticar globais ou afirmar ausência de testes sem localizar a dependência, o compartilhamento ou a dificuldade de controle.
+- **Afirmações insuficientes:** Uma crítica a variáveis globais ou uma afirmação de que faltam testes é insuficiente sem a identificação da dependência, do compartilhamento ou da dificuldade de controle.
 - **Distinção e contagem:** passar fonte/moeda por instância não elimina a persistência do cache nem a aleatoriedade da emissão. Fonte e moeda formam um item de ambiente.
 
 ### C5-B-02 — Cache estático compartilhado
@@ -45,9 +45,9 @@
 - **Fundamentação:** [Global Data][S13], [Isolamento e não determinismo em testes (Fowler)][S15].
 - **Decisão ou fragilidade observável:** ReceiptBuilder.receipts é estático e guarda resultados entre geradores. Para o mesmo identificador, outra instância pode reutilizar o recibo de uma fonte anterior após reconfigurar o ambiente.
 - **Elementos e evidências:** Cache estático: [linhas 13–13](../codigos/C5-B.ts#L13-L13); Consulta e escrita no cache: [linhas 15–26](../codigos/C5-B.ts#L15-L26).
-- **Critério mínimo de detecção:** identificar o cache compartilhado e reconhecer persistência entre instâncias/fontes ou interferência entre testes.
+- **Critério mínimo de detecção:** A resposta identifica o cache compartilhado e reconhece a persistência entre instâncias ou fontes, ou a interferência entre testes.
 - **Formulações equivalentes aceitas:** estado estático, cache global, contaminação entre instâncias ou baixa testabilidade por estado persistente.
-- **Afirmações insuficientes:** Criticar globais ou afirmar ausência de testes sem localizar a dependência, o compartilhamento ou a dificuldade de controle.
+- **Afirmações insuficientes:** Uma crítica a variáveis globais ou uma afirmação de que faltam testes é insuficiente sem a identificação da dependência, do compartilhamento ou da dificuldade de controle.
 - **Distinção e contagem:** usar cache por instância deixa a configuração global e a fonte aleatória implícita presentes. O problema continua observável com fonte/moeda injetadas. A chave e a persistência não geram dois acertos.
 
 ### C5-B-03 — Aleatoriedade como dependência oculta
@@ -65,10 +65,10 @@
 - **Fundamentação:** [Hidden Dependencies][S14], [Isolamento e não determinismo em testes (Fowler)][S15].
 - **Decisão ou fragilidade observável:** ReceiptBuilder.issue chama Math.random diretamente para compor a referência de emissão. O chamador não fornece o valor ou o gerador, dificultando controlar as saídas em testes.
 - **Elementos e evidências:** Geração implícita do valor aleatório: [linhas 28–33](../codigos/C5-B.ts#L28-L33).
-- **Critério mínimo de detecção:** localizar a obtenção implícita do valor e reconhecer dificuldade de controlar saídas ou reproduzir casos nos testes.
+- **Critério mínimo de detecção:** A resposta localiza a obtenção implícita do valor aleatório e reconhece a dificuldade de controlar as saídas ou reproduzir casos nos testes.
 - **Formulações equivalentes aceitas:** aleatoriedade não controlada, dependência ambiental implícita, fonte de não determinismo ou Hidden Dependencies.
-- **Afirmações insuficientes:** Criticar globais ou afirmar ausência de testes sem localizar a dependência, o compartilhamento ou a dificuldade de controle.
-- **Distinção e contagem:** fornecer um gerador controlável não corrige o ambiente global nem o cache. A propriedade aleatória é esperada; o alvo é o controle da dependência. Não exigir afirmar que chamadas sempre produzem valores diferentes.
+- **Afirmações insuficientes:** Uma crítica a variáveis globais ou uma afirmação de que faltam testes é insuficiente sem a identificação da dependência, do compartilhamento ou da dificuldade de controle.
+- **Distinção e contagem:** Um gerador controlável deixa presentes o ambiente global e o cache. A aleatoriedade é esperada e o critério se concentra no controle dessa dependência. A afirmação de que chamadas sempre produzem valores diferentes é dispensável.
 
 ## Fontes
 
