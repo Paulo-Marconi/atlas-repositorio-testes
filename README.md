@@ -23,7 +23,7 @@ C1 inclui concentração e dispersão de responsabilidades; C3 distingue escrita
 
 O [protocolo](deteccao-arquitetural/protocolo.md) detalha questões de pesquisa, modelos, ambiente documentado, coleta, falhas técnicas, classificação e métricas. Estão previstas **150 execuções**: dez códigos × três modelos × cinco repetições, em sessões sem histórico. Cada arquivo é enviado integralmente, com numeração original das linhas e sem categoria ou referência de avaliação.
 
-Modelos documentados no capítulo orientador: M1 — gemma-4-E4B-it-GGUF; M2 — Qwen3.6-27B-GGUF; M3 — GPT-6 Luna (`gpt-6-luna`). Os modelos locais usam Q4_K_M. Os parâmetros de partida e as versões declaradas estão no protocolo; os valores efetivos deverão ser preservados por execução.
+O M1 é o Gemma 4 E4B (`unsloth/gemma-4-E4B-it-GGUF`), executado localmente com quantização Q4_K_M. O M2 é o GPT-OSS-20B (`unsloth/gpt-oss-20b-GGUF`), executado localmente com quantização MXFP4. O M3 é o GPT-6 Luna (`gpt-6-luna`), executado em nuvem. O protocolo documenta os parâmetros de partida e as versões declaradas e prevê o registro dos valores efetivos por execução.
 
 A classificação inicial é revisada pela equipe, com identificação dos modelos disponível, conforme o capítulo orientador. No escopo da avaliação, FP indica um apontamento distinto de problema estrutural sem correspondência com os três problemas esperados para o arquivo. A validade desses apontamentos no código não é avaliada separadamente. Por isso, a precisão e a medida F1 expressam o desempenho em relação à referência.
 
@@ -45,5 +45,3 @@ As métricas são automáticas. A precisão é indefinida quando VP e FP são am
 - [Protocolo](deteccao-arquitetural/protocolo.md): regras operacionais da avaliação.
 - [Verificação técnica](deteccao-arquitetural/verificacao-tecnica.md): testes realizados, cálculos da planilha e limites da conferência.
 - [Planejamento do experimento](deteccao-arquitetural/planejamento-experimento.md): decisões de construção dos cenários e critérios de avaliação.
-
-Os exemplos e os materiais estão implementados e tecnicamente verificados. A revisão independente da equipe, a fixação do commit e das instruções de coleta e as execuções dos modelos ainda precisam ocorrer para produzir os resultados do experimento. A amostra construída permite comparação exploratória; não estabelece superioridade universal ou validação automática das adaptações pelas fontes.
